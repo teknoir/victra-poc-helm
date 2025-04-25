@@ -1,11 +1,10 @@
 triton:
+  modelRepositoryPath: /opt/teknoir/models
   models:
     - name: rtdetr
       image:  us-docker.pkg.dev/teknoir/gcr.io/rtdetr-triton:latest
     - name: up-down-classifier
       image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest
-    - name: safe-classifier
-      image: us-docker.pkg.dev/teknoir/gcr.io/safe-classifier-triton:latest
     - name: resnet50-reid
       image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-reid-triton:latest
     - name: resnet50-pose-estimation
