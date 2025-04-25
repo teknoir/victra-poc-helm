@@ -7,7 +7,6 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.5.0
   targetNamespace: default
   valuesContent: |-
     nvr:
