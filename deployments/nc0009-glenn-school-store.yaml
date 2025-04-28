@@ -115,8 +115,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
   
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -127,16 +128,16 @@ spec:
                 ! queue ! tee name=tee
   
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
   
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
   
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
@@ -176,8 +177,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
     
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -188,16 +190,16 @@ spec:
                 ! queue ! tee name=tee
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
     
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
@@ -237,8 +239,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
     
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -249,16 +252,16 @@ spec:
                 ! queue ! tee name=tee
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
     
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
@@ -298,8 +301,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
     
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -310,16 +314,16 @@ spec:
                 ! queue ! tee name=tee
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
     
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
@@ -359,8 +363,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
   
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -371,16 +376,16 @@ spec:
                 ! queue ! tee name=tee
   
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
   
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
   
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
@@ -420,8 +425,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
     
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -432,16 +438,16 @@ spec:
                 ! queue ! tee name=tee
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
     
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
@@ -481,8 +487,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
     
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -493,16 +500,16 @@ spec:
                 ! queue ! tee name=tee
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
     
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
@@ -542,8 +549,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
     
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -554,16 +562,16 @@ spec:
                 ! queue ! tee name=tee
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
     
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
