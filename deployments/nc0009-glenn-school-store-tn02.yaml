@@ -2,7 +2,7 @@
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
-  name: nc0009-glenn-school-store
+  name: nc0009-glenn-school-store-tn2
   namespace: default
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
@@ -106,7 +106,69 @@ spec:
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
     
-        - name: nc0009-backroom-safe-tn2
+        - name: nc0009-backroom-safe-0-tn2
+          camera:
+            uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
+            pipeline:
+              rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
+      
+              unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+  
+              src.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
+                ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
+                ! queue ! nvstreamdemux name=nvdemux 
+  
+              nvdemux.src_0 
+                ! queue ! tee name=tee
+  
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
+  
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
+  
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
+                ! queue ! nvvideoconvert 
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
+                ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
+
+          nvdewarper:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              source-id=0
+              output-width=1920
+              output-height=1080
+              num-batch-buffers=1
+    
+              [surface0]
+              surface-index=0
+              projection-type=4
+              width=2560
+              height=1440
+              rot-axes=ZXY
+              pitch=50
+              yaw=0
+              roll=0
+              src-fov=180
+              src-x0=2000
+              src-y0=1500
+              focal-length=960
+              distortion=0;0;0;0
+
+        - name: nc0009-backroom-safe-90-tn2
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
             pipeline:
@@ -115,8 +177,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
     
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -127,22 +190,233 @@ spec:
                 ! queue ! tee name=tee
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
     
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
+
+          nvdewarper:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              source-id=0
+              output-width=1920
+              output-height=1080
+              num-batch-buffers=1
     
-        - name: nc0009-salefloor-tn2
+              [surface0]
+              surface-index=0
+              projection-type=4
+              width=2560
+              height=1440
+              rot-axes=ZXY
+              pitch=50
+              yaw=0
+              roll=90
+              src-fov=180
+              src-x0=2000
+              src-y0=1500
+              focal-length=960
+              distortion=0;0;0;0
+    
+        - name: nc0009-backroom-safe-180-tn2
+          camera:
+            uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
+            pipeline:
+              rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
+    
+              unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+    
+              src.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
+                ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
+                ! queue ! nvstreamdemux name=nvdemux 
+    
+              nvdemux.src_0 
+                ! queue ! tee name=tee
+    
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
+    
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
+    
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
+                ! queue ! nvvideoconvert 
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
+                ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
+
+          nvdewarper:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              source-id=0
+              output-width=1920
+              output-height=1080
+              num-batch-buffers=1
+    
+              [surface0]
+              surface-index=0
+              projection-type=4
+              width=2560
+              height=1440
+              rot-axes=ZXY
+              pitch=50
+              yaw=0
+              roll=180
+              src-fov=180
+              src-x0=2000
+              src-y0=1500
+              focal-length=960
+              distortion=0;0;0;0
+
+        - name: nc0009-backroom-safe-270-tn2
+          camera:
+            uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
+            pipeline:
+              rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
+    
+              unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+    
+              src.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
+                ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
+                ! queue ! nvstreamdemux name=nvdemux 
+    
+              nvdemux.src_0 
+                ! queue ! tee name=tee
+    
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
+    
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
+    
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
+                ! queue ! nvvideoconvert 
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
+                ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
+
+          nvdewarper:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              source-id=0
+              output-width=1920
+              output-height=1080
+              num-batch-buffers=1
+    
+              [surface0]
+              surface-index=0
+              projection-type=4
+              width=2560
+              height=1440
+              rot-axes=ZXY
+              pitch=50
+              yaw=0
+              roll=0
+              src-fov=270
+              src-x0=2000
+              src-y0=1500
+              focal-length=960
+              distortion=0;0;0;0
+  
+        - name: nc0009-salefloor-0-tn2
+          camera:
+            uri: rtsp://admin:Redex1997!@192.168.51.112/stream1
+            pipeline:
+              rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
+      
+              unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+  
+              src.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
+                ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
+                ! queue ! nvstreamdemux name=nvdemux 
+  
+              nvdemux.src_0 
+                ! queue ! tee name=tee
+  
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
+  
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
+  
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
+                ! queue ! nvvideoconvert 
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
+                ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
+
+          nvdewarper:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              source-id=0
+              output-width=1920
+              output-height=1080
+              num-batch-buffers=1
+  
+              [surface0]
+              surface-index=0
+              projection-type=4
+              width=2560
+              height=1440
+              rot-axes=ZXY
+              pitch=50
+              yaw=0
+              roll=0
+              src-fov=180
+              src-x0=2000
+              src-y0=1500
+              focal-length=960
+              distortion=0;0;0;0
+
+        - name: nc0009-salefloor-90-tn2
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.112/stream1
             pipeline:
@@ -151,8 +425,9 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
     
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -163,21 +438,170 @@ spec:
                 ! queue ! tee name=tee
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2000],height=[1,1500],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
     
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
                 ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
     
               tee.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2000,height=1500 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
                 ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
 
+          nvdewarper:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              source-id=0
+              output-width=1920
+              output-height=1080
+              num-batch-buffers=1
+    
+              [surface0]
+              surface-index=0
+              projection-type=4
+              width=2560
+              height=1440
+              rot-axes=ZXY
+              pitch=50
+              yaw=0
+              roll=90
+              src-fov=180
+              src-x0=2000
+              src-y0=1500
+              focal-length=960
+              distortion=0;0;0;0
+
+        - name: nc0009-salefloor-180-tn2
+          camera:
+            uri: rtsp://admin:Redex1997!@192.168.51.112/stream1
+            pipeline:
+              rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
+    
+              unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+    
+              src.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
+                ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
+                ! queue ! nvstreamdemux name=nvdemux 
+    
+              nvdemux.src_0 
+                ! queue ! tee name=tee
+    
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
+    
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
+    
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
+                ! queue ! nvvideoconvert 
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
+                ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
+    
+          nvdewarper:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              source-id=0
+              output-width=1920
+              output-height=1080
+              num-batch-buffers=1
+    
+              [surface0]
+              surface-index=0
+              projection-type=4
+              width=2560
+              height=1440
+              rot-axes=ZXY
+              pitch=50
+              yaw=0
+              roll=180
+              src-fov=180
+              src-x0=2000
+              src-y0=1500
+              focal-length=960
+              distortion=0;0;0;0
+
+        - name: nc0009-salefloor-270-tn2
+          camera:
+            uri: rtsp://admin:Redex1997!@192.168.51.112/stream1
+            pipeline:
+              rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
+    
+              unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+    
+              src.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000
+                ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 num-surfaces-per-frame=1
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
+                ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
+                ! queue ! nvstreamdemux name=nvdemux 
+    
+              nvdemux.src_0 
+                ! queue ! tee name=tee
+    
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue 
+                ! queue ! nvjpegenc quality=55 ! appsink sync=0 name=mqttsink 
+    
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
+    
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
+                ! queue ! nvvideoconvert 
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
+                ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
+
+          nvdewarper:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              source-id=0
+              output-width=1920
+              output-height=1080
+              num-batch-buffers=1
+    
+              [surface0]
+              surface-index=0
+              projection-type=4
+              width=2560
+              height=1440
+              rot-axes=ZXY
+              pitch=50
+              yaw=0
+              roll=270
+              src-fov=180
+              src-x0=2000
+              src-y0=1500
+              focal-length=960
+              distortion=0;0;0;0
+    
     observatory-pipeline:
       defaults:
         debugLevel: DEBUG
