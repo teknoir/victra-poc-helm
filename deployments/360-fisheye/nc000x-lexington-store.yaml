@@ -2,7 +2,7 @@
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
-  name: nc0009-glenn-school-store
+  name: nc0211-lexington-store
   namespace: default
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
@@ -59,7 +59,7 @@ spec:
               ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
   
       instances:
-        - name: nc000x-front-door-left
+        - name: nc0211-front-door-1
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.15/stream1
             pipeline: |-
@@ -93,7 +93,7 @@ spec:
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
   
-        - name: nc000x-18
+        - name: nc0211-pos
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.18/stream1
             pipeline: |-
@@ -127,19 +127,19 @@ spec:
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
   
-        - name: nc000x-20
+        - name: nc0211-breakroom-back-door
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.20/stream1
   
-        - name: nc000x-21
+        - name: nc0211-safe
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.21/stream1
       
-        - name: nc000x-22
+        - name: nc0211-sales-floor
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.22/stream1
   
-        - name: nc000x-23
+        - name: nc0211-height-strip
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.23/live.sdp
             pipeline: |-
@@ -175,7 +175,7 @@ spec:
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
   
-        - name: nc000x-front-door-right
+        - name: nc0211-front-door-2
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.24/live.sdp
             pipeline: |-

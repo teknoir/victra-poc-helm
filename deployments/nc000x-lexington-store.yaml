@@ -2,7 +2,7 @@
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
-  name: nc000x-lexington-store
+  name: nc0211-lexington-store
   namespace: default
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
@@ -62,7 +62,7 @@ spec:
               ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
   
       instances:
-        - name: nc000x-front-door-left
+        - name: nc0211-front-door-1
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.15/stream1
             pipeline: |-
@@ -148,7 +148,7 @@ spec:
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
     
-        - name: nc000x-20-0
+        - name: nc0211-breakroom-back-door-0
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.20/stream1
           nvdewarper:
@@ -176,7 +176,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
     
-        - name: nc000x-20-90
+        - name: nc0211-breakroom-back-door-90
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.20/stream1
           nvdewarper:
@@ -204,7 +204,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
 
-        - name: nc000x-20-180
+        - name: nc0211-breakroom-back-door-180
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.20/stream1
           nvdewarper:
@@ -232,7 +232,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
     
-        - name: nc000x-20-270
+        - name: nc0211-breakroom-back-door-270
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.20/stream1
           nvdewarper:
@@ -260,7 +260,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
     
-        - name: nc000x-21-0
+        - name: nc0211-safe-0
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.21/stream1
           nvdewarper:
@@ -288,7 +288,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
     
-        - name: nc000x-21-90
+        - name: nc0211-safe-90
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.21/stream1
           nvdewarper:
@@ -316,7 +316,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
     
-        - name: nc000x-21-180
+        - name: nc0211-safe-180
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.21/stream1
           nvdewarper:
@@ -344,7 +344,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
     
-        - name: nc000x-21-270
+        - name: nc0211-safe-270
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.21/stream1
           nvdewarper:
@@ -379,7 +379,7 @@ spec:
               rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
         
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
-    
+
               src.
                 ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=4000,height=3000 ! queue 
                 ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=4000 height=3000 
@@ -437,7 +437,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
 
-        - name: nc000x-22-90
+        - name: nc0211-sales-floor-90
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.22/stream1
           nvdewarper:
@@ -465,7 +465,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
     
-        - name: nc000x-22-180
+        - name: nc0211-sales-floor-180
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.22/stream1
           nvdewarper:
@@ -493,7 +493,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
 
-        - name: nc000x-22-270
+        - name: nc0211-sales-floor-270
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.22/stream1
           nvdewarper:
@@ -521,7 +521,7 @@ spec:
               focal-length=960
               distortion=0;0;0;0
 
-        - name: nc000x-23
+        - name: nc0211-height-strip
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.23/live.sdp
             pipeline: |-
@@ -557,7 +557,7 @@ spec:
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
   
-        - name: nc000x-front-door-right
+        - name: nc0211-front-door-2
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.24/live.sdp
             pipeline: |-
