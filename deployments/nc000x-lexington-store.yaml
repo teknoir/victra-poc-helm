@@ -7,6 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
+  version: 0.0.6
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -80,6 +81,8 @@ spec:
                 ! queue ! tee name=tee
   
               tee.
+                ! queue ! nvdsanalytics config-file=/app/nvdsanalytics_config/config_nvdsanalytics.txt 
+                ! queue ! nvdsosd display-bbox=0
                 ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
                 ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink 
@@ -94,8 +97,24 @@ spec:
                 ! queue ! nvvideoconvert 
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
-  
-        - name: nc0211-pos
+
+          nvdsanalytics:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              config-width=1920
+              config-height=1080
+              osd-mode=0
+              display-font-size=25
+
+              [line-crossing-stream-0]
+              enable=1
+              extended=0
+              line-crossing-Entry-0=893;513;872;712;746;698;997;726
+              line-crossing-Exit-0=850;911;872;712;997;726;746;698
+
+        - name: nc000x-18
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.18/stream1
             pipeline: |-
@@ -352,8 +371,8 @@ spec:
               src-y0=1500
               focal-length=960
               distortion=0;0;0;0  
-    
-        - name: nc0211-sales-floor-0
+
+        - name: nc0211-pos
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.22/stream1
           nvdewarper:
@@ -520,6 +539,8 @@ spec:
                 ! queue ! tee name=tee
   
               tee.
+                ! queue ! nvdsanalytics config-file=/app/nvdsanalytics_config/config_nvdsanalytics.txt
+                ! queue ! nvdsosd display-bbox=0
                 ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
                 ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink 
@@ -535,12 +556,28 @@ spec:
                 ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
                 ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
 
+          nvdsanalytics:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              config-width=1920
+              config-height=1080
+              osd-mode=0
+              display-font-size=25
+
+              [line-crossing-stream-0]
+              enable=1
+              extended=0
+              line-crossing-Entry-0=1001;472;1003;672;878;673;1127;671
+              line-crossing-Exit-0=1004;872;1003;672;1127;671;878;673
+
     observatory-pipeline:
       defaults:
         debugLevel: DEBUG
   
         image:
-          tag: face-cover-alert-45f3078
+          tag: dev-58f25a3
   
         labels:
           deviceID: "victra-poc-03"

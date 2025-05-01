@@ -2,11 +2,12 @@
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
-  name: nc0009-glenn-school-store-tn2
+  name: nc0009-glenn-school-store
   namespace: default
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
+  version: 0.0.6
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -607,7 +608,7 @@ spec:
         debugLevel: DEBUG
     
         image:
-          tag: face-cover-alert-45f3078
+          tag: dev-58f25a3
     
         labels:
           deviceID: "victra-poc-02"

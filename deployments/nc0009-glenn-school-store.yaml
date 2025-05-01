@@ -7,6 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
+  version: 0.0.6
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -69,7 +70,57 @@ spec:
         - name: nc0009-front-door
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.111/stream1
-  
+            pipeline: |-
+              rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
+        
+              unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+    
+              src.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2688,height=1520 ! queue 
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=2688 height=1520 
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
+                ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
+                ! queue ! nvstreamdemux name=nvdemux 
+    
+              nvdemux.src_0 
+                ! queue ! tee name=tee
+    
+              tee.
+                ! queue ! nvdsanalytics config-file=/app/nvdsanalytics_config/config_nvdsanalytics.txt
+                ! queue ! nvdsosd display-bbox=0
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue 
+                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink 
+    
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink 
+    
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1 
+                ! queue ! nvvideoconvert 
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 
+                ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=2880 name=splitmux
+
+          nvdsanalytics:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              config-width=1920
+              config-height=1080
+              osd-mode=0
+              display-font-size=25
+
+              [line-crossing-stream-0]
+              enable=1
+              extended=0
+              line-crossing-Entry-0=980;574;966;773;847;765;1084;782
+              line-crossing-Exit-0=951;973;966;773;1084;782;847;765
+
         - name: nc0009-height-strip
           camera:
             uri: rtsp://root:Redex1997!@192.168.51.117/live1s1.sdp
@@ -607,7 +658,7 @@ spec:
         debugLevel: DEBUG
   
         image:
-          tag: face-cover-alert-45f3078
+          tag: dev-58f25a3
   
         labels:
           deviceID: "victra-poc-01"
@@ -678,4 +729,3 @@ spec:
             video:
               mountSegmentPath: true
               mountClipTempPath: true
-
