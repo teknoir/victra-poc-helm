@@ -89,7 +89,7 @@ spec:
     
               tee.
                 ! queue ! nvdsanalytics config-file=/app/nvdsanalytics_config/config_nvdsanalytics.txt
-                ! queue ! nvdsosd display-bbox=0
+                ! queue ! nvdsosd display-bbox=0 display-text=0
                 ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
                 ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink 
@@ -664,9 +664,16 @@ spec:
           deviceID: "victra-poc-01"
           namespace: "victra-poc"
           domain: "teknoir.cloud"
-  
-        #mqtt:
-        #  topicToeEventsAlerts: toe/events
+    
+        historian:
+          recordDetectionsInterval: 100 # ms
+          objectsToFilter: "person,weapon,gun" # not interested in cars
+    
+        clickhouse:
+          detectionRetention: 1 # hours
+          movementRetention: 24 # hours
+          inferenceRetention: 1 # hours
+          alertRetention: 24 # hours
   
       streams:
         - stream: update-frame-rate-control
@@ -680,13 +687,13 @@ spec:
             faceRecThreshold: 0.9
             faceImageSize: 100
         # ALERTS
-        #- stream: motion
         - stream: loitering
         - stream: person-down
         - stream: line-crossing
         - stream: hands-up
         - stream: running
         - stream: face-cover
+        - stream: weapons
         # ALERT PROCESSING
         - stream: update-alerts
   

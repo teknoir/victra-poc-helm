@@ -615,8 +615,15 @@ spec:
           namespace: "victra-poc"
           domain: "teknoir.cloud"
     
-        #mqtt:
-        #  topicToeEventsAlerts: toe/events
+        historian:
+          recordDetectionsInterval: 100 # ms
+          objectsToFilter: "person,weapon,gun" # not interested in cars
+    
+        clickhouse:
+          detectionRetention: 1 # hours
+          movementRetention: 24 # hours
+          inferenceRetention: 1 # hours
+          alertRetention: 24 # hours
     
       streams:
         #- stream: update-frame-rate-control

@@ -2,13 +2,13 @@ triton:
   modelRepositoryPath: /opt/teknoir/models
   models:
     - name: rtdetr
-      image:  us-docker.pkg.dev/teknoir/gcr.io/rtdetr-triton:latest
-    - name: up-down-classifier
-      image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest
-    - name: resnet50-reid
-      image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-reid-triton:latest
+      image: us-docker.pkg.dev/teknoir/gcr.io/rtdetr-triton:latest-amd64-trt10.8-cc8.9-20250505-105553
+    - name: rtdetr-weapons
+      image: us-docker.pkg.dev/teknoir/gcr.io/rtdetr-weapons-triton:latest
     - name: resnet50-pose-estimation
-      image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-pose-estimation-triton:latest
+      image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-pose-estimation-triton:latest-amd64-trt10.8-cc8.9-20250507-065729
+    - name: up-down-classifier
+      image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest-amd64-trt10.8-cc8.9-20250508-094640
 
 nvr:
   defaults:
@@ -20,8 +20,13 @@ nvr:
       # Send events without motion detected
       nonMotionEvents: true
     motion:
+      # Number of frames to skip inference when no motion detected
+      inactiveInterval: 900
       # Number of frames to skip inference when motion is detected
       activeInterval: 3
+    image:
+      # AMD64
+      tag: ds7.1-gst1.24.7
     nvdsanalytics:
       enabled: true
       config: |
@@ -36,9 +41,55 @@ nvr:
 observatory-pipeline:
   defaults:
     debugLevel: INFO
+
+    image:
+      tag: dev-58f25a3
+
     labels:
       teamspace: "victra-poc"
       domain: "teknoir.cloud"
+
+    historian:
+      recordDetectionsInterval: 50 # ms
+      objectsToFilter: "person,weapon,gun" # not interested in vehicles
+
+    clickhouse:
+      detectionRetention: 1 # hours
+      movementRetention: 24 # hours
+      inferenceRetention: 1 # hours
+      alertRetention: 24 # hours
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 12Gi
+        requests:
+          cpu: 10m
+          memory: 50Mi
+
+    keydb:
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 12Gi
+        requests:
+          cpu: 10m
+          memory: 50Mi
+
+    file-transfer:
+      defaults:
+        debugLevel: INFO
+
+        labels:
+          namespace: "victra-poc"
+          domain: "teknoir.cloud"
+
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 5Gi
+          requests:
+            cpu: 10m
+            memory: 50Mi
 
 #  streams:
 #    - stream: update-frame-rate-control
