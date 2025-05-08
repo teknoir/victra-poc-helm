@@ -7,22 +7,13 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
+  version: 0.0.7-ds7.2
   targetNamespace: default
   valuesContent: |-
     nvr:
       defaults:
         debugLevel: DEBUG
-        motion:
-          # Number of frames to skip inference when no motion detected
-          inactiveInterval: 900
-          # Number of frames to skip inference when motion is detected
-          activeInterval: 3
-        mqtt:
-          # Send events without inference calculated
-          nonInferenceEvents: false 
-        image:
-          # AMD64
-          tag: ds7-gst1.24.7
+
         camera:
           pipeline: |-
             rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc

@@ -7,22 +7,13 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
+  version: 0.0.7-ds7.2
   targetNamespace: default
   valuesContent: |-
     nvr:
       defaults:
         debugLevel: DEBUG
-        motion:
-          # Number of frames to skip inference when no motion detected
-          inactiveInterval: 900
-          # Number of frames to skip inference when motion is detected
-          activeInterval: 3
-        mqtt:
-          # Send events without inference calculated
-          nonInferenceEvents: false 
-        image:
-          # AMD64
-          tag: ds7-gst1.24.7
+
         camera:
           # Special configuration for 360 cameras, contain data substream, need SPS/PPS headers are injected and it needed byte-stream with au alignment 
           pipeline:
@@ -213,17 +204,9 @@ spec:
       defaults:
         debugLevel: DEBUG
   
-        image:
-          tag: face-cover-alert-45f3078
-  
         labels:
           deviceID: "victra-poc-03"
-          namespace: "victra-poc"
-          domain: "teknoir.cloud"
-  
-        #mqtt:
-        #  topicToeEventsAlerts: toe/events
-  
+    
       streams:
         - stream: update-frame-rate-control
         - stream: record-detections
@@ -236,52 +219,12 @@ spec:
             faceRecThreshold: 0.9
             faceImageSize: 100
         # ALERTS
-        #- stream: motion
         - stream: loitering
         - stream: person-down
         - stream: line-crossing
         - stream: hands-up
         - stream: running
         - stream: face-cover
+        - stream: weapons
         # ALERT PROCESSING
         - stream: update-alerts
-  
-      clickhouse:
-        resources:
-          limits:
-            cpu: 2000m
-            memory: 12Gi
-          requests:
-            cpu: 10m
-            memory: 50Mi
-        nodePort:
-          enabled: true
-      keydb:
-        nodePort:
-          enabled: true
-      
-      file-transfer:
-        defaults:
-          debugLevel: DEBUG
-  
-          labels:
-            deviceID: "victra-poc-03"
-            namespace: "victra-poc"
-            domain: "teknoir.cloud"
-  
-          resources:
-            limits:
-              cpu: 2000m
-              memory: 5Gi
-            requests:
-              cpu: 10m
-              memory: 50Mi
-        streams:
-          - stream: prepare-file
-            video:
-              mountSegmentPath: true
-              mountClipTempPath: true
-          - stream: transfer-file      
-            video:
-              mountSegmentPath: true
-              mountClipTempPath: true
