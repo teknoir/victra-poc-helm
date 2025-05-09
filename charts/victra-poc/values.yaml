@@ -23,7 +23,7 @@ nvr:
       # Number of frames to skip inference when no motion detected
       inactiveInterval: 900
       # Number of frames to skip inference when motion is detected
-      activeInterval: 3
+      activeInterval: 4
     image:
       # AMD64
       tag: ds7.1-gst1.24.12
