@@ -26,7 +26,7 @@ nvr:
       activeInterval: 3
     image:
       # AMD64
-      tag: ds7.1-gst1.24.7
+      tag: ds7.1-gst1.24.12
     nvdsanalytics:
       enabled: true
       config: |

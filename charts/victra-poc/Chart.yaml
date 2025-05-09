@@ -3,7 +3,7 @@ name: victra-poc
 description: A Helm chart for Victra PoC
 
 type: application
-version: 0.0.7-ds7.2
+version: 0.0.7-ds7.3
 appVersion: "1.0.0"
 
 dependencies:
