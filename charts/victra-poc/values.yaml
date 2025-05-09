@@ -43,7 +43,7 @@ observatory-pipeline:
     debugLevel: INFO
 
     image:
-      tag: dev-58f25a3
+      tag: feature-multicamid-7672449
 
     labels:
       teamspace: "victra-poc"
