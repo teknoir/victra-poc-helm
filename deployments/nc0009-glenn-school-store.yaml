@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.0.7-ds7.2
+  version: 0.0.7-ds7.5
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -680,6 +680,7 @@ spec:
         - stream: running
         - stream: face-cover
         - stream: weapons
+        - stream: safe-open
         # ALERT PROCESSING
         - stream: update-alerts
 

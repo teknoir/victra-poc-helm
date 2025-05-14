@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.0.7-ds7.2
+  version: 0.0.7-ds7.5
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -611,17 +611,17 @@ spec:
           deviceID: "victra-poc-02"
 
       streams:
-        - stream: update-frame-rate-control
+        #- stream: update-frame-rate-control
         - stream: record-detections
         - stream: update-movements
-        - stream: compreface
-          mqtt:
-            topicFaces: "toe/events/faces"
-          facerec:
-            compreFaceApiKey: "00000000-0000-0000-0000-000000000002"
-            faceRecThreshold: 0.9
-            faceImageSize: 100
-        # ALERTS
+        #- stream: compreface
+        #  mqtt:
+        #    topicFaces: "toe/events/faces"
+        #  facerec:
+        #    compreFaceApiKey: "00000000-0000-0000-0000-000000000002"
+        #    faceRecThreshold: 0.9
+        #    faceImageSize: 100
+        ## ALERTS
         - stream: loitering
         - stream: person-down
         - stream: line-crossing
@@ -629,5 +629,6 @@ spec:
         - stream: running
         - stream: face-cover
         - stream: weapons
+        - stream: safe-open
         # ALERT PROCESSING
-        - stream: update-alerts
+        #- stream: update-alerts

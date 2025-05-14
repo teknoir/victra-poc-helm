@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.0.7-ds7.2
+  version: 0.0.7-ds7.5
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -16,7 +16,11 @@ spec:
 
         camera:
           # Special configuration for 360 cameras, contain data substream, need SPS/PPS headers are injected and it needed byte-stream with au alignment
+          # 360 @nc0211(Lexington) cameras has 20fps compared to the normal 15fps
           # Also configure the camera to use the dewarper to get the correct views
+          motion:
+            inactiveInterval: 1200
+            activeInterval: 5
           pipeline:
             rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
   
@@ -593,6 +597,7 @@ spec:
         - stream: running
         - stream: face-cover
         - stream: weapons
+        - stream: safe-open
         # ALERT PROCESSING
         - stream: update-alerts
 
