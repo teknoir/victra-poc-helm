@@ -4,7 +4,7 @@ triton:
     - name: rtdetr
       image: us-docker.pkg.dev/teknoir/gcr.io/rtdetr-triton:latest-amd64-trt10.8-cc8.9-20250505-105553
     - name: rtdetr-weapons
-      image: us-docker.pkg.dev/teknoir/gcr.io/rtdetr-weapons-triton:latest
+      image: us-docker.pkg.dev/teknoir/gcr.io/rtdetr-weapons-triton:latest-amd64-trt10.8-cc8.9-v2-20250515-053841
     - name: resnet50-pose-estimation
       image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-pose-estimation-triton:latest-amd64-trt10.8-cc8.9-20250507-065729
     - name: up-down-classifier
@@ -52,7 +52,7 @@ nvr:
       # Number of frames to skip inference when no motion detected
       inactiveInterval: 900
       # Number of frames to skip inference when motion is detected
-      activeInterval: 4
+      activeInterval: 3
     image:
       # AMD64
       tag: ds7.1-gst1.24.12
@@ -83,13 +83,22 @@ observatory-pipeline:
       objectsToFilter: "person,weapon,gun" # not interested in vehicles
 
     alerts:
+      personDownInterval: 10
+      personDownScoreThreshold: 0.85
+      personUpScoreThreshold: 0.75
+      personDownUpTotalCountThreshold: 10
+
       alertHeatmapAlertsToFilter: "loitering,person_down,weapon,hands_up"
       alertHeatmapHardSupression: true
+      handsUpInterval: 500 # milliseconds
+      handsUpWindow: 1 # seconds
+      minHandsUpDetectionsPerSecond: 1.2 # per second
 
     weaponsDetection:
+      scoreThreshold: 0.75 # score threshold
       interval: 500 # milliseconds
       window: 1 # seconds
-      minDetectionsPerSecond: 1.8 # detections per second
+      minDetectionsPerSecond: 1.8 # per second
 
     clickhouse:
       detectionRetention: 1 # hours
