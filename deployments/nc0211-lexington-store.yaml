@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.0.7-ds7.5
+  version: 0.0.7-ds7.1.8
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -16,11 +16,10 @@ spec:
 
         camera:
           # Special configuration for 360 cameras, contain data substream, need SPS/PPS headers are injected and it needed byte-stream with au alignment
-          # 360 @nc0211(Lexington) cameras has 20fps compared to the normal 15fps
           # Also configure the camera to use the dewarper to get the correct views
           motion:
             inactiveInterval: 1200
-            activeInterval: 5
+            activeInterval: 3
           pipeline:
             rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
   
@@ -33,7 +32,7 @@ spec:
               ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
               ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
               ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
-              ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons_config.pbtxt unique-id=90 interval=3
+              ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons/rtdetr-weapons_config.pbtxt unique-id=90 interval=10
               ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
               ! queue ! nvstreamdemux name=nvdemux 
   
@@ -64,12 +63,12 @@ spec:
               uridecodebin3 uri={{.uri}} name=src 
   
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2688,height=1520 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=2688 height=1520 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 ! queue 
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
-                ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons_config.pbtxt unique-id=90 interval=3
+                ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons/rtdetr-weapons_config.pbtxt unique-id=90 interval=10
                 ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
                 ! queue ! nvstreamdemux name=nvdemux 
   
@@ -81,7 +80,7 @@ spec:
                 ! queue ! nvdsosd display-bbox=0 display-text=0
                 ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
   
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
@@ -114,15 +113,17 @@ spec:
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.113/stream1
             pipeline: |-
-              uridecodebin3 uri={{.uri}} name=src 
+              rtspsrc location={{.uri}} protocols=tcp latency=500 name=unmappedsrc
+    
+              unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
   
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2688,height=1520 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=2688 height=1520 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080 ! queue 
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080 
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
-                ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons_config.pbtxt unique-id=90 interval=3
+                ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons/rtdetr-weapons_config.pbtxt unique-id=90 interval=10
                 ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
                 ! queue ! nvstreamdemux name=nvdemux 
   
@@ -132,7 +133,7 @@ spec:
               tee.
                 ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
   
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
@@ -495,7 +496,7 @@ spec:
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
-                ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons_config.pbtxt unique-id=90 interval=3
+                ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons/rtdetr-weapons_config.pbtxt unique-id=90 interval=10
                 ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
                 ! queue ! nvstreamdemux name=nvdemux 
   
@@ -505,7 +506,7 @@ spec:
               tee.
                 ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
   
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
@@ -530,7 +531,7 @@ spec:
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
-                ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons_config.pbtxt unique-id=90 interval=3
+                ! queue ! nvinferserver name=weapons config-file-path=/models/rtdetr-weapons/rtdetr-weapons_config.pbtxt unique-id=90 interval=10
                 ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0 
                 ! queue ! nvstreamdemux name=nvdemux 
   
@@ -542,7 +543,7 @@ spec:
                 ! queue ! nvdsosd display-bbox=0 display-text=0
                 ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
-                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink 
+                ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
   
               tee.
                 ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1 
@@ -601,3 +602,15 @@ spec:
         # ALERT PROCESSING
         - stream: update-alerts
 
+      file-transfer:
+        defaults:
+          labels:
+            deviceID: "victra-poc-03"
+            
+      # DEBUG NOT FOR PRODUCTION
+      clickhouse:
+        nodePort:
+          enabled: true
+      keydb:
+        nodePort:
+          enabled: true
