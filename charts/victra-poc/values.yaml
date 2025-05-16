@@ -93,7 +93,7 @@ observatory-pipeline:
 
       handsUpInterval: 500 # milliseconds
       handsUpWindow: 1 # seconds
-      minHandsUpDetectionsPerSecond: 1.2 # per second
+      minHandsUpDetectionsPerSecond: 0.9 # per second
 
     weaponsDetection:
       scoreThreshold: 0.8 # score threshold

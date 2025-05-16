@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.0.7-ds7.8
+  version: 0.0.7-ds7.1.8
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -662,7 +662,7 @@ spec:
         debugLevel: DEBUG
   
         labels:
-          deviceID: "victra-poc-01"
+          deviceID: "victra-poc-02"
     
       streams:
         - stream: update-frame-rate-control
@@ -690,6 +690,6 @@ spec:
       file-transfer:
         defaults:
           labels:
-            deviceID: "victra-poc-01"
+            deviceID: "victra-poc-02"
           image:
             tag: main-612e96c
