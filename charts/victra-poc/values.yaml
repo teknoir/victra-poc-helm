@@ -50,29 +50,7 @@ nvr:
         config-height=1080
         osd-mode=0
         display-font-size=25
-    nvdewarper:
-      enabled: true
-      config: |
-        [property]
-        enable=1
-        source-id=0
-        output-width=2560
-        output-height=1440
-        num-batch-buffers=1
-        [surface0]
-        surface-index=0
-        projection-type=4
-        width=2560
-        height=1440
-        rot-axes=ZXY
-        pitch=50
-        yaw=0
-        roll=270
-        src-fov=180
-        src-x0=2560
-        src-y0=1440
-        focal-length=960
-        distortion=0;0;0;0
+
   instances: []
   
 observatory-pipeline:
