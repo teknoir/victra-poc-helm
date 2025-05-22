@@ -22,8 +22,6 @@ spec:
   valuesContent: |-
     # triton: See the triton-helm chart for details
     # nvr: See the nvr-helm chart for details
-    # pipelines: See the pipelines-helm chart for details
-    # historian: See the historian-helm chart for details
     # observatory-pipeline: See the observatory-pipeline-helm chart for details
 ```
 

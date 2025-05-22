@@ -70,8 +70,8 @@ spec:
               unmappedsrc. ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
     
               src.
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2688,height=1520 ! queue 
-                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=2688 height=1520 
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=2560,height=1440 ! queue 
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=2560 height=1440 
                 ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr_config.pbtxt unique-id=2 interval=5 
                 ! queue ! nvinferserver config-file-path=/models/up_down_classifier_config.pbtxt unique-id=5
                 ! queue ! nvinferserver config-file-path=/models/resnet50_pose_estimation_config.pbtxt unique-id=200
@@ -85,7 +85,7 @@ spec:
               tee.
                 ! queue ! nvdsanalytics config-file=/app/nvdsanalytics_config/config_nvdsanalytics.txt
                 ! queue ! nvdsosd display-bbox=0 display-text=0
-                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,2560],height=[1,1440],pixel-aspect-ratio=1/1
                 ! queue ! nvvideoconvert ! queue 
                 ! queue ! nvjpegenc quality=65 ! appsink sync=0 name=mqttsink 
     
