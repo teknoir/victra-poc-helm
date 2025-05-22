@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.0.7-ds7.1.8
+  version: 0.1.0-beta.0
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -37,9 +37,6 @@ spec:
               rtspSrc:
                 width: 2560
                 height: 1440
-              jpegMQTT:
-                width: 2560
-                height: 1440
           nvdsanalytics:
             enabled: true
             config: |
@@ -61,9 +58,6 @@ spec:
             pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
             pipelineValues:
               rtspSrc:
-                width: 2560
-                height: 1440
-              jpegMQTT:
                 width: 2560
                 height: 1440
           nvdsanalytics:
@@ -89,29 +83,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=30
-              yaw=0
-              roll=0
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
     
         - name: nc0211-backroom-safe-door-90
           camera:
@@ -121,29 +92,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=30
-              yaw=0
-              roll=90
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
 
         - name: nc0211-backroom-safe-door-180
           camera:
@@ -153,29 +101,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=180
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
     
         - name: nc0211-backroom-safe-door-270
           camera:
@@ -185,29 +110,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=270
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
     
         - name: nc0211-safe-back-door-0
           camera:
@@ -217,29 +119,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=0
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
     
         - name: nc0211-safe-back-door-90
           camera:
@@ -249,29 +128,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=30
-              yaw=0
-              roll=90
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
     
         - name: nc0211-safe-back-door-180
           camera:
@@ -281,29 +137,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=30
-              yaw=0
-              roll=180
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
     
         - name: nc0211-safe-back-door-270
           camera:
@@ -313,29 +146,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=270
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0  
 
         - name: nc0211-sales-floor-0
           camera:
@@ -345,29 +155,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=0
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
 
         - name: nc0211-sales-floor-90
           camera:
@@ -377,29 +164,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=90
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
     
         - name: nc0211-sales-floor-180
           camera:
@@ -409,29 +173,6 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=180
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
 
         - name: nc0211-sales-floor-270
           camera:
@@ -441,33 +182,13 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=1920
-              output-height=1080
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2560
-              height=1440
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=270
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
 
     observatory-pipeline:
       defaults:
         debugLevel: DEBUG
+
+        image:
+          tag: dev-0f0ec07
 
         labels:
           deviceID: "victra-poc-03"
