@@ -201,8 +201,8 @@ spec:
               rot-axes=ZXY
               pitch=50
               yaw=0
-              roll=0
-              src-fov=270
+              roll=270
+              src-fov=180
               src-x0=2000
               src-y0=1500
               focal-length=960
