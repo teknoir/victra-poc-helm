@@ -3,23 +3,28 @@
 {{/*# Also configure the camera to use the dewarper to get the correct views*/}}
 rtspsrc location={{- template "cameraURI" . }} protocols=tcp latency=500 name=unmappedsrc
 unmappedsrc.
-    ! application/x-rtp,media=video,encoding-name=H264 ! rtpjitterbuffer ! rtph264depay ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+    ! application/x-rtp,media=video,encoding-name=H264
+    ! rtpjitterbuffer
+    ! rtph264depay
+    ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au
+    ! queue ! nvv4l2decoder
+    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }} name=src
 {{- end }}
 
 {{- define "testRTSPSrc" }}
-videotestsrc is-live=true name=src
+videotestsrc is-live=true
+    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }} name=src
 {{- end }}
 
 {{- define "defaultNvStreamMux" }}
 src.
-    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }}
+    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "nvstreammuxWidth" . }},height={{- template "nvstreammuxHeight" . }}
     ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width={{- template "nvstreammuxWidth" . }} height={{- template "nvstreammuxHeight" . }}
 {{- end }}
 
 
 {{- define "nvdsdewarperNvStreamMux" }}
 src.
-    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }}
     ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
     ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width={{- template "nvstreammuxWidth" . }} height={{- template "nvstreammuxHeight" . }}
 {{- end }}
