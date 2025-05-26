@@ -271,7 +271,7 @@ spec:
         debugLevel: DEBUG
 
         image:
-          tag: dev-0f0ec07
+          tag: dev-c82c317
 
         labels:
           deviceID: "victra-poc-03"
