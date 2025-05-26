@@ -6,6 +6,9 @@ camera:
         rtspSrc:
             width: 1920
             height: 1080
+        nvstreammux:
+            width: 1920
+            height: 1080
         jpegMQTT:
             width: 1920
             height: 1080
@@ -41,6 +44,19 @@ camera:
         (default $default.camera.pipelineValues .camera.pipelineValues).rtspSrc).height -}}
 {{- end }}
 
+{{- define "nvstreammuxWidth" }}
+{{- $default := (include "defaultPipelineValues" . | fromYaml) }}
+{{- default $default.camera.pipelineValues.nvstreammux.width
+    (default $default.camera.pipelineValues.nvstreammux
+        (default $default.camera.pipelineValues .camera.pipelineValues).nvstreammux).width -}}
+{{- end }}
+
+{{- define "nvstreammuxHeight" }}
+{{- $default := (include "defaultPipelineValues" . | fromYaml) }}
+{{- default $default.camera.pipelineValues.nvstreammux.height
+    (default $default.camera.pipelineValues.nvstreammux
+        (default $default.camera.pipelineValues .camera.pipelineValues).nvstreammux).height -}}
+{{- end }}
 
 {{- define "jpegMQTTWidth" -}}
 {{- $default := (include "defaultPipelineValues" . | fromYaml) }}

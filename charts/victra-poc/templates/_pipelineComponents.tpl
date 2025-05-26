@@ -13,7 +13,7 @@ videotestsrc is-live=true name=src
 {{- define "defaultNvStreamMux" }}
 src.
     ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }}
-    ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width={{- template "rtspSrcWidth" . }} height={{- template "rtspSrcHeight" . }}
+    ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width={{- template "nvstreammuxWidth" . }} height={{- template "nvstreammuxHeight" . }}
 {{- end }}
 
 
@@ -21,7 +21,7 @@ src.
 src.
     ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }}
     ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
-    ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width={{- template "rtspSrcWidth" . }} height={{- template "rtspSrcHeight" . }}
+    ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width={{- template "nvstreammuxWidth" . }} height={{- template "nvstreammuxHeight" . }}
 {{- end }}
 
 
