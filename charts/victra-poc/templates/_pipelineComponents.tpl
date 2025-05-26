@@ -8,12 +8,12 @@ unmappedsrc.
     ! rtph264depay
     ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au
     ! queue ! nvv4l2decoder
-    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }} name=src
+    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }} ! queue name=src
 {{- end }}
 
 {{- define "testRTSPSrc" }}
 videotestsrc is-live=true
-    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }} name=src
+    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }} ! queue name=src
 {{- end }}
 
 {{- define "defaultNvStreamMux" }}
