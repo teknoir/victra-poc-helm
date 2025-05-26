@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.1.0-beta.3
+  version: 0.1.0-beta.4
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -83,6 +83,9 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
           nvdewarperValues:
             pitch: 30
             roll: 0
@@ -96,6 +99,9 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
           nvdewarperValues:
             pitch: 30
             roll: 90
@@ -109,6 +115,9 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
           nvdewarperValues:
             pitch: 50
             roll: 180
@@ -122,6 +131,9 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
           nvdewarperValues:
             pitch: 30
             roll: 270
@@ -135,6 +147,9 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
           nvdewarperValues:
             pitch: 50
             roll: 0
@@ -148,6 +163,9 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
           nvdewarperValues:
             pitch: 30
             roll: 90

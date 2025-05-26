@@ -9,28 +9,29 @@ nvdewarperValues:
 
 {{- define "nvdewarperWidth" }}
 {{- $default := (include "defaultNvDewarperValues" . | fromYaml) }}
-{{- default $default.nvdewarperValues.width .width -}}
+{{- default $default.nvdewarperValues.width (default $default.nvdewarperValues .nvdewarperValues).width -}}
 {{- end }}
 
 {{- define "nvdewarperHeight" }}
 {{- $default := (include "defaultNvDewarperValues" . | fromYaml) }}
-{{- default $default.nvdewarperValues.height .height -}}
+{{- default $default.nvdewarperValues.height (default $default.nvdewarperValues .nvdewarperValues).height -}}
 {{- end }}
 
 {{- define "nvdewarperPitch" }}
 {{- $default := (include "defaultNvDewarperValues" . | fromYaml) }}
-{{- default $default.nvdewarperValues.pitch .pitch -}}
+{{- default $default.nvdewarperValues.pitch (default $default.nvdewarperValues .nvdewarperValues).pitch -}}
 {{- end }}
 
 {{- define "nvdewarperYaw" }}
 {{- $default := (include "defaultNvDewarperValues" . | fromYaml) }}
-{{- default $default.nvdewarperValues.yaw .yaw -}}
+{{- default $default.nvdewarperValues.yaw (default $default.nvdewarperValues .nvdewarperValues).yaw -}}
 {{- end }}
 
 {{- define "nvdewarperRoll" }}
 {{- $default := (include "defaultNvDewarperValues" . | fromYaml) }}
-{{- default $default.nvdewarperValues.roll .roll -}}
+{{- default $default.nvdewarperValues.roll (default $default.nvdewarperValues .nvdewarperValues).roll -}}
 {{- end }}
+
 
 {{- define "360NvDeWarper" }}
 [property]
