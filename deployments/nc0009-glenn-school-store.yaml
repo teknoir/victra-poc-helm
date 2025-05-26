@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.1.0-beta.2
+  version: 0.1.0-beta.3
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -16,8 +16,8 @@ spec:
 
         camera:
           motion:
-            inactiveInterval: 900
-            activeInterval: 3          
+            inactiveInterval: 1200
+            activeInterval: 7          
           pipeline: "{{ template \"defaultPipeline\" . }}"
   
       instances:
@@ -57,7 +57,7 @@ spec:
 
               [line-crossing-stream-0]
               enable=1
-              extended=0
+              extended=1
               line-crossing-Entry-0=980;574;966;773;847;765;1084;782
               line-crossing-Exit-0=951;973;966;773;1084;782;847;765
 
@@ -73,32 +73,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=0
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 0
+
 
         - name: nc0009-backroom-safe-90
           camera:
@@ -108,33 +86,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-    
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=90
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 90
+
     
         - name: nc0009-backroom-safe-180
           camera:
@@ -144,33 +99,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-    
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=180
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 180
+
 
         - name: nc0009-backroom-safe-270
           camera:
@@ -180,33 +112,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-    
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=270
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 270
+
   
         - name: nc0009-salefloor-0
           camera:
@@ -216,32 +125,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=0
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 0
+
 
         - name: nc0009-salefloor-90
           camera:
@@ -251,32 +138,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=90
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 90
+
 
         - name: nc0009-salefloor-180
           camera:
@@ -286,32 +151,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=180
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 180
+
 
         - name: nc0009-salefloor-270
           camera:
@@ -321,32 +164,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=270
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 270
+
     
     observatory-pipeline:
       defaults:

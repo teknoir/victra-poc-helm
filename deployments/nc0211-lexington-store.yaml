@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.1.0-beta.2
+  version: 0.1.0-beta.3
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -48,7 +48,7 @@ spec:
               display-font-size=25
               [line-crossing-stream-0]
               enable=1
-              extended=0
+              extended=1
               line-crossing-Entry-0=893;513;872;712;746;698;997;726
               line-crossing-Exit-0=850;911;872;712;997;726;746;698
 
@@ -71,7 +71,7 @@ spec:
               display-font-size=25
               [line-crossing-stream-0]
               enable=1
-              extended=0
+              extended=1
               line-crossing-Entry-0=1001;472;1003;672;878;673;1127;671
               line-crossing-Exit-0=1004;872;1003;672;1127;671;878;673
     
@@ -83,32 +83,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=30
-              yaw=0
-              roll=0
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 30
+            roll: 0
+
     
         - name: nc0211-backroom-safe-door-90
           camera:
@@ -118,32 +96,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=30
-              yaw=0
-              roll=90
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 30
+            roll: 90
+
 
         - name: nc0211-backroom-safe-door-180
           camera:
@@ -153,32 +109,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=180
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 180
+
     
         - name: nc0211-backroom-safe-door-270
           camera:
@@ -188,32 +122,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=270
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 30
+            roll: 270
+
     
         - name: nc0211-safe-back-door-0
           camera:
@@ -223,32 +135,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=0
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 50
+            roll: 0
+
     
         - name: nc0211-safe-back-door-90
           camera:
@@ -258,32 +148,10 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
-          nvdewarper:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=30
-              yaw=0
-              roll=90
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+          nvdewarperValues:
+            pitch: 30
+            roll: 90
+
     
         - name: nc0211-safe-back-door-180
           camera:
@@ -293,32 +161,13 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
           nvdewarper:
             enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=30
-              yaw=0
-              roll=180
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 30
+            roll: 180
+
     
         - name: nc0211-safe-back-door-270
           camera:
@@ -328,32 +177,13 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
           nvdewarper:
             enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=270
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0  
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 50
+            roll: 270
+  
 
         - name: nc0211-sales-floor-0
           camera:
@@ -363,32 +193,13 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
           nvdewarper:
             enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=0
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 50
+            roll: 0
+
 
         - name: nc0211-sales-floor-90
           camera:
@@ -398,32 +209,13 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
           nvdewarper:
             enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=90
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 50
+            roll: 90
+
     
         - name: nc0211-sales-floor-180
           camera:
@@ -433,32 +225,13 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
           nvdewarper:
             enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=180
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 50
+            roll: 180
+
 
         - name: nc0211-sales-floor-270
           camera:
@@ -468,32 +241,12 @@ spec:
               rtspSrc:
                 width: 4000
                 height: 3000
-              jpegMQTT:
-                width: 2000
-                height: 1500
           nvdewarper:
             enabled: true
-            config: |
-              [property]
-              enable=1
-              source-id=0
-              output-width=2000
-              output-height=1500
-              num-batch-buffers=1
-              [surface0]
-              surface-index=0
-              projection-type=4
-              width=2000
-              height=1500
-              rot-axes=ZXY
-              pitch=50
-              yaw=0
-              roll=270
-              src-fov=180
-              src-x0=2000
-              src-y0=1500
-              focal-length=960
-              distortion=0;0;0;0
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 50
+            roll: 270
 
     observatory-pipeline:
       defaults:

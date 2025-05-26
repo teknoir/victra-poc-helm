@@ -30,15 +30,8 @@ src.
 {{- end }}
 
 
-{{- define "defaultNvInferServer" }}
-    ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=5
-    ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
-    ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
-{{- end }}
-
-
-{{- define "nvcdfNvTracker" }}
-    ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/models/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0
+{{- define "nvcdfNvTrackerResnet50ReId" }}
+    ! queue ! nvtracker tracker-width=128 tracker-height=256 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/resnet50-reid-tracker/config.yaml compute-hw=1 gpu-id=0
 {{- end }}
 
 
@@ -46,6 +39,14 @@ src.
     ! queue ! nvstreamdemux name=nvdemux nvdemux.src_0 ! queue ! tee name=tee
 tee.
 {{- end }}
+
+
+{{- define "defaultNvInferServer" }}
+    ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=15
+    ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
+    ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
+{{- end }}
+
 
 {{- define "defaultInference" }}
 {{- template "defaultNvStreamMux" . }}
