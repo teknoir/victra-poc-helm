@@ -26,6 +26,7 @@ src.
 {{- define "nvdsdewarperNvStreamMux" }}
 src.
     ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "nvstreammuxWidth" . }},height={{- template "nvstreammuxHeight" . }}
     ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width={{- template "nvstreammuxWidth" . }} height={{- template "nvstreammuxHeight" . }}
 {{- end }}
 
