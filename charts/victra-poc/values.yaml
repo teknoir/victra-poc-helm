@@ -11,6 +11,10 @@ triton:
 
 nvr:
   defaults:
+    trackers:
+      - name: nvidia-tracker
+        image: us-docker.pkg.dev/teknoir/gcr.io/nvidia-tracker-deepstream:latest
+
     camera:
       pipeline: "{{ template \"testPipeline\" . }}"
 # The pipelineValues defaults are added through the pipeline templates in the templates folder
