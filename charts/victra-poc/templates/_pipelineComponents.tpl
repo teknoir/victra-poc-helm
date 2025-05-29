@@ -42,7 +42,7 @@ src.
 
 
 {{- define "customStickyNvDeepSortTracker" }}
-    ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_custom_sticky_NvDeepSORT.yml compute-hw=1 gpu-id=0
+    ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_custom_sticky_NvDeepSORT_b50.yml compute-hw=1 gpu-id=0
 {{- end }}
 
 {{- define "defaultNvDCFPerfTracker" }}
@@ -65,7 +65,7 @@ tee.
 {{- define "defaultInference" }}
 {{- template "defaultNvStreamMux" . }}
 {{- template "defaultNvInferServer" . }}
-{{- template "defaultNvDCFPerfTracker" . }}
+{{- template "customStickyNvDeepSortTracker" . }}
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
@@ -77,7 +77,7 @@ tee.
 {{- define "nvdsdewarperInference" }}
 {{- template "nvdsdewarperNvStreamMux" . }}
 {{- template "defaultNvInferServer" . }}
-{{- template "defaultNvDCFPerfTracker" . }}
+{{- template "customStickyNvDeepSortTracker" . }}
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
