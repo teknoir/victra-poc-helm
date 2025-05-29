@@ -62,7 +62,7 @@ observatory-pipeline:
     debugLevel: INFO
 
     image:
-      tag: weaponscore.3-not-committed
+      tag: dev-81ab03c
 
     labels:
       teamspace: "victra-poc"
