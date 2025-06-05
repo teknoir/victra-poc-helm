@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.1.0-beta.6
+  version: 0.1.1-beta.6
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -16,7 +16,7 @@ spec:
 
         camera:
           motion:
-            inactiveInterval: 1200
+            inactiveInterval: 600
             activeInterval: 3
           pipeline: "{{ template \"defaultPipeline\" . }}"
 
@@ -31,6 +31,8 @@ spec:
 
         - name: nc0211-front-door-1
           camera:
+            motion:
+              activeInterval: 0
             uri: rtsp://admin:Redex1997!@192.168.51.117/stream1
             pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
             pipelineValues:
@@ -54,6 +56,8 @@ spec:
 
         - name: nc0211-front-door-2
           camera:
+            motion:
+              activeInterval: 0
             uri: rtsp://admin:Redex1997!@192.168.51.116/live.sdp
             pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
             pipelineValues:

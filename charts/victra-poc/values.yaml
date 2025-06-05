@@ -16,6 +16,11 @@ nvr:
         image: us-docker.pkg.dev/teknoir/gcr.io/nvidia-tracker-deepstream:latest
 
     camera:
+      motion:
+        # Number of frames to skip inference when no motion detected
+        inactiveInterval: 600
+        # Number of frames to skip inference when motion is detected
+        activeInterval: 3
       pipeline: "{{ template \"testPipeline\" . }}"
 # The pipelineValues defaults are added through the pipeline templates in the templates folder
 # Here is an example of how to set the pipeline values can be defined in each camera instance
@@ -37,11 +42,6 @@ nvr:
       nonInferenceEvents: false
       # Send events without motion detected
       nonMotionEvents: true
-    motion:
-      # Number of frames to skip inference when no motion detected
-      inactiveInterval: 900
-      # Number of frames to skip inference when motion is detected
-      activeInterval: 3
     image:
       # AMD64
       tag: ds7.1-gst1.24.12
@@ -69,8 +69,8 @@ observatory-pipeline:
       domain: "teknoir.cloud"
 
     historian:
-      recordDetectionsInterval: 50 # ms
-      objectsToFilter: "face,weapon,person" # not interested in vehicles
+      recordDetectionsInterval: 10 # ms
+      objectsToFilter: "face_cover,face,weapon,person" # not interested in vehicles
 
     alerts:
       alertHeatmapAlertsToFilter: "loitering,person_down,weapon,hands_up"
