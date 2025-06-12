@@ -15,9 +15,6 @@ spec:
         debugLevel: DEBUG
 
         camera:
-          motion:
-            inactiveInterval: 600
-            activeInterval: 3
           pipeline: "{{ template \"defaultPipeline\" . }}"
 
       instances:
@@ -32,7 +29,7 @@ spec:
         - name: nc0211-front-door-1
           camera:
             motion:
-              activeInterval: 0
+              activeInterval: "0"
             uri: rtsp://admin:Redex1997!@192.168.51.117/stream1
             pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
             pipelineValues:
@@ -57,7 +54,7 @@ spec:
         - name: nc0211-front-door-2
           camera:
             motion:
-              activeInterval: 0
+              activeInterval: "0"
             uri: rtsp://admin:Redex1997!@192.168.51.116/live.sdp
             pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
             pipelineValues:

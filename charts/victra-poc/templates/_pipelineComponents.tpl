@@ -108,3 +108,12 @@ tee.
     ! queue ! h264parse ! queue ! splitmuxsink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{- template "cameraID" . }}_%05d.mp4 max-size-time={{- template "videoRecorderSegmentSizeTime" . }}000000000 max-files={{- template "videoRecorderSegmentCount" . }} name=splitmux
 {{- end }}
 
+{{- define "defaultAnnotatingVideoRecorder" }}
+tee.
+    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "videoRecorderWidth" . }},height={{- template "videoRecorderHeight" . }}
+    ! queue ! nvvideoconvert
+    ! queue ! videorate ! video/x-raw,framerate=10/1
+    ! queue ! nvvideoconvert
+    ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5
+    ! queue ! h264parse ! queue ! splitmuxsink sink=nvdsfilesink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true location=/app/videos/{{- template "cameraID" . }}_%05d.mp4 max-size-time={{- template "videoRecorderSegmentSizeTime" . }}000000000 max-files={{- template "videoRecorderSegmentCount" . }} name=splitmux
+{{- end }}

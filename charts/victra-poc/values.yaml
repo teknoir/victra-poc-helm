@@ -5,9 +5,9 @@ triton:
     - name: rtdetr-wwfp
       image: us-docker.pkg.dev/teknoir/gcr.io/rtdetr-wwfp-triton:latest
     - name: resnet50-pose-estimation
-      image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-pose-estimation-triton:latest-amd64-trt10.8-cc8.9-wwfp-20250520-071434
+      image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-pose-estimation-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250612-062857
     - name: up-down-classifier
-      image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest-amd64-trt10.8-cc8.9-wwfp-20250520-063931
+      image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250612-062722
 
 nvr:
   defaults:
