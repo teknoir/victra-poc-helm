@@ -106,24 +106,6 @@ observatory-pipeline:
           cpu: 10m
           memory: 50Mi
 
-  streams:
-    - stream: update-frame-rate-control
-    - stream: record-detections
-    - stream: update-movements
-    # ALERTS
-    - stream: loitering
-    - stream: person-down
-    - stream: line-crossing
-    - stream: hands-up
-    - stream: running
-    - stream: face-cover
-    - stream: weapons
-    - stream: safe-open
-    - stream: backdoor-open
-    - stream: facerec-cutout
-    # ALERT PROCESSING
-    - stream: update-alerts
-
     keydb:
       resources:
         limits:
@@ -149,3 +131,20 @@ observatory-pipeline:
             cpu: 10m
             memory: 50Mi
 
+  streams:
+    - stream: update-frame-rate-control
+    - stream: record-detections
+    - stream: update-movements
+    # ALERTS
+    - stream: loitering
+    - stream: person-down
+    - stream: line-crossing
+    - stream: hands-up
+    - stream: running
+    - stream: face-cover
+    - stream: weapons
+    - stream: safe-open
+    - stream: backdoor-open
+    - stream: facerec-cutout
+    # ALERT PROCESSING
+    - stream: update-alerts
