@@ -8,6 +8,8 @@ triton:
       image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-pose-estimation-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250612-062857
     - name: up-down-classifier
       image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250612-062722
+    - name: vggface-facerec
+      image: us-docker.pkg.dev/teknoir/gcr.io/vggface-facerec-triton:latest-initial-test-20250616-090311
 
 nvr:
   defaults:
@@ -103,6 +105,24 @@ observatory-pipeline:
         requests:
           cpu: 10m
           memory: 50Mi
+
+  streams:
+    - stream: update-frame-rate-control
+    - stream: record-detections
+    - stream: update-movements
+    # ALERTS
+    - stream: loitering
+    - stream: person-down
+    - stream: line-crossing
+    - stream: hands-up
+    - stream: running
+    - stream: face-cover
+    - stream: weapons
+    - stream: safe-open
+    - stream: backdoor-open
+    - stream: facerec-cutout
+    # ALERT PROCESSING
+    - stream: update-alerts
 
     keydb:
       resources:
