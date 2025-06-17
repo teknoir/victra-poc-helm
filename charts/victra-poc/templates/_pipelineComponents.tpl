@@ -66,7 +66,7 @@ tee.
 {{- define "defaultInference" }}
 {{- template "defaultNvStreamMux" . }}
 {{- template "defaultNvInferServer" . }}
-{{- template "customStickyNvDeepSortTracker" . }}
+{{- template "defaultNvTracker" . }}
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
@@ -78,7 +78,7 @@ tee.
 {{- define "nvdsdewarperInference" }}
 {{- template "nvdsdewarperNvStreamMux" . }}
 {{- template "defaultNvInferServer" . }}
-{{- template "customStickyNvDeepSortTracker" . }}
+{{- template "defaultNvTracker" . }}
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
