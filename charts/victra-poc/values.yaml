@@ -7,7 +7,7 @@ triton:
     - name: resnet50-pose-estimation
       image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-pose-estimation-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250612-062857
     - name: up-down-classifier
-      image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250617-062359
+      image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250618-150146
     - name: vggface-facerec
       image: us-docker.pkg.dev/teknoir/gcr.io/vggface-facerec-triton:latest-initial-test-20250616-090311
 
@@ -145,6 +145,6 @@ observatory-pipeline:
     - stream: weapons
     - stream: safe-open
     - stream: backdoor-open
-    - stream: facerec-cutout
+    #- stream: facerec-cutout
     # ALERT PROCESSING
     - stream: update-alerts
