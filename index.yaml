@@ -3,6 +3,26 @@ entries:
   victra-poc:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-07-25T11:03:23.586837052Z"
+    dependencies:
+    - name: nvr
+      repository: https://teknoir.github.io/nvr-helm
+      version: 0.2.14-beta.3
+    - name: triton
+      repository: https://teknoir.github.io/triton-helm
+      version: 0.2.0
+    - name: observatory-pipeline
+      repository: https://teknoir.github.io/observatory-pipeline-helm
+      version: 0.1.3-chart-fixing.2
+    description: A Helm chart for Victra PoC
+    digest: 8d9bc3cb8030ff188cd70ac0d1edb2a249e3eb746086ed46b7aa925db03d3064
+    name: victra-poc
+    type: application
+    urls:
+    - https://github.com/teknoir/victra-poc-helm/releases/download/victra-poc-0.1.1-beta.14/victra-poc-0.1.1-beta.14.tgz
+    version: 0.1.1-beta.14
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2025-06-25T11:20:39.96554136Z"
     dependencies:
     - name: nvr
@@ -721,4 +741,4 @@ entries:
     urls:
     - https://github.com/teknoir/victra-poc-helm/releases/download/victra-poc-0.0.2/victra-poc-0.0.2.tgz
     version: 0.0.2
-generated: "2025-06-25T11:20:39.965940552Z"
+generated: "2025-07-25T11:03:23.587420658Z"
