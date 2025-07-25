@@ -3,12 +3,12 @@ name: victra-poc
 description: A Helm chart for Victra PoC
 
 type: application
-version: 0.1.1-beta.13
+version: 0.1.1-beta.14
 appVersion: "1.0.0"
 
 dependencies:
   - name: nvr
-    version: 0.2.14-beta.1
+    version: 0.2.14-beta.3
     repository: https://teknoir.github.io/nvr-helm
   - name: triton
     version: 0.2.0
@@ -16,3 +16,7 @@ dependencies:
   - name: observatory-pipeline
     version: 0.1.3-chart-fixing.2
     repository: https://teknoir.github.io/observatory-pipeline-helm
+  # Local dependency, dev only
+  # - name: nvr
+  #   version: 0.2.14-beta.2
+  #   repository: file://../../../nvr-helm/charts/nvr
