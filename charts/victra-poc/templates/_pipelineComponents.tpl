@@ -83,7 +83,7 @@ tee.
 {{- end }}
 
 {{- define "defaultNvDsAnalytics" }}
-    ! queue ! nvdsanalytics config-file=/app/nvdsanalytics_config/config_nvdsanalytics.txt
+    ! queue ! nvdsanalytics config-file=/app/nvdsanalytics_config/config_nvdsanalytics.{{- default "txt" (default .Values.nvr.defaults.nvdsanalytics.configFormat .nvdsanalytics.configFormat) }}
     ! queue ! nvdsosd display-bbox=0 display-text=0
 {{- end }}
 

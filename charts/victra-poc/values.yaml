@@ -56,6 +56,15 @@ nvr:
         config-height=1080
         osd-mode=0
         display-font-size=25
+      ## YAML
+      # configFormat: yaml
+      # config: |
+      #   property:
+      #     enable: 1
+      #     config-width: 1920
+      #     config-height: 1080
+      #     osd-mode: 0
+      #     display-font-size: 25
 
   instances: []
   
