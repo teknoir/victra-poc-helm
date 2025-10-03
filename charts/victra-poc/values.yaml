@@ -24,21 +24,19 @@ nvr:
         # Number of frames to skip inference when motion is detected
         activeInterval: 3
       pipeline: "{{ template \"testPipeline\" . }}"
-# The pipelineValues defaults are added through the pipeline templates in the templates folder
-# Here is an example of how to set the pipeline values can be defined in each camera instance
-#      pipelineValues:
-#        rtspSrc:
-#          width: 1920
-#          height: 1080
-#        jpegMQTT:
-#          width: 1920
-#          height: 1080
-#          quality: 65
-#        videoRecorder:
-#          width: 1920
-#          height: 1080
-#          segmentSizeTime: 15
-#          segmentCount: 2880
+      pipelineValues:
+        rtspSrc:
+          width: 1920
+          height: 1080
+        jpegMQTT:
+          width: 1920
+          height: 1080
+          quality: 65
+        videoRecorder:
+          width: 1920
+          height: 1080
+          segmentSizeTime: 15
+          segmentCount: 8640
     mqtt:
       # Send events without inference calculated
       nonInferenceEvents: false
@@ -73,7 +71,7 @@ observatory-pipeline:
     debugLevel: INFO
 
     image:
-      tag: dev-81ab03c
+      tag: dev-bf9da9d
 
     labels:
       teamspace: "victra-poc"
@@ -88,8 +86,7 @@ observatory-pipeline:
       alertHeatmapHardSupression: true
 
       personDownInterval: 10
-      personDownScoreThreshold: 0.85
-      personUpScoreThreshold: 0.75
+      personDownDominantThreshold: 0.85
       personDownUpTotalCountThreshold: 10
 
       handsUpInterval: 500 # milliseconds
@@ -154,6 +151,8 @@ observatory-pipeline:
     - stream: weapons
     - stream: safe-open
     - stream: backdoor-open
+    - stream: pos-event
+    - stream: alarm-event
     #- stream: facerec-cutout
     # ALERT PROCESSING
     - stream: update-alerts
