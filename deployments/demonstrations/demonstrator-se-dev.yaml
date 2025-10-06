@@ -1,0 +1,209 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: demonstrator-se-dev
+  namespace: default
+spec:
+  repo: https://teknoir.github.io/victra-poc-helm
+  chart: victra-poc
+  version: 0.1.2-beta.1
+  targetNamespace: default
+  valuesContent: |-
+    nvr:
+      defaults:
+        debugLevel: DEBUG
+
+        image:
+          tag: ds7.1-gst1.24.12-local-20250625-220847
+
+        camera:
+          motion:
+            # Number of frames to skip inference when no motion detected
+            inactiveInterval: 600
+            # Number of frames to skip inference when motion is detected
+            activeInterval: 1          
+          pipeline: "{{ template \"batch1Pipeline\" . }}"
+          pipelineValues:
+            videoRecorder:
+              segmentCount: 864
+    
+      instances:
+        - name: demonstrator-se-lc1
+          camera:
+            motion:
+              activeInterval: "0" 
+            uri: rtsp://mediamtx:8554/nc009-6-27-2025
+    
+    
+        - name: demonstrator-se-rb1
+          camera:
+            uri: rtsp://mediamtx:8554/nc0051-robbery1
+            pipeline: "{{ template \"360Batch1Pipeline\" . }}"
+            pipelineValues:
+              rtspSrc:
+                  width: 4000
+                  height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 40
+            roll: 45
+
+
+        - name: demonstrator-se-rb2
+          camera:
+            uri: rtsp://mediamtx:8554/nc0051-robbery2
+            pipeline: "{{ template \"360Batch1Pipeline\" . }}"
+            pipelineValues:
+              rtspSrc:
+                  width: 4000
+                  height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 55
+            roll: 0
+
+
+        - name: demonstrator-se-rb3
+          camera:
+            uri: rtsp://mediamtx:8554/nc0051-robbery3
+            pipelineValues:
+              rtspSrc:
+                  width: 1830
+                  height: 1134
+    
+    
+        - name: demonstrator-se-hr1
+          camera:
+            uri: rtsp://mediamtx:8554/hands-raised1
+    
+    
+        - name: demonstrator-se-rn1
+          camera:
+            uri: rtsp://mediamtx:8554/running1
+
+
+        - name: demonstrator-se-rn2
+          camera:
+            uri: rtsp://mediamtx:8554/running2
+
+
+    observatory-pipeline:
+      defaults:
+        debugLevel: DEBUG
+
+        image:
+          tag: feature-burst-mode-refacor-e3b351c
+
+        labels:
+          deviceID: "demonstrator-se"
+          teamspace: "demonstrations"
+          domain: "teknoir.dev"
+    
+        roiStreamConfig:
+          enabled: true
+          peripherals:
+            - name: demonstrator-se-lc1
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-filtering-Exclusion-Zone-0: "0;0;68;0;68;49;353;472;1920;532;1920;1080;0;1080"
+              lc-config:
+                lc-Entry-0: "1180;284;1171;484;1082;480;1259;488"
+                lc-Exit-0: "1161;683;1171;484;1259;488;1082;480"
+
+        historian:
+          recordDetectionsInterval: 5
+          objectsToFilter: "face_cover,face,weapon,person" # not interested in vehicles
+
+        alerts:
+          alertHeatmapAlertsToFilter: "loitering,person_down,weapon,hands_up"
+          alertHeatmapHardSupression: false
+    
+          personDownInterval: 10
+          personDownScoreThreshold: 0.85
+          personUpScoreThreshold: 0.75
+          personDownUpTotalCountThreshold: 10
+    
+          handsUpInterval: 500 # milliseconds
+          handsUpWindow: 1 # seconds
+          minHandsUpDetectionsPerSecond: 1.2 # per second
+    
+        weaponsDetection:
+          scoreThreshold: 0.8 # score threshold
+          interval: 500 # milliseconds
+          window: 1 # seconds
+          minDetectionsPerSecond: 1.2 # per second
+    
+        clickhouse:
+          detectionRetention: 1 # hours
+          movementRetention: 24 # hours
+          inferenceRetention: 1 # hours
+          alertRetention: 24 # hours
+    
+        lineCrossing:
+          intervalMs: 1000 # milliseconds
+          windowMs: 5000 # milliseconds
+          visualDebugEnabled: true
+          visualDebugPeripheralId: "demonstrator-se-lc1"
+    
+      streams:
+        - stream: update-frame-rate-control
+        - stream: record-detections
+        - stream: update-movements
+        # ALERTS
+        - stream: loitering
+          roiStreamConfig:
+            enabled: true
+            config: |
+              roi-loitering-Exclusion-Zone-0: "0;0;100;0;100;100;0;100"
+        - stream: person-down
+        - stream: line-crossing
+        - stream: hands-up
+        - stream: running
+        - stream: face-cover
+        - stream: weapons
+        - stream: safe-open
+        - stream: backdoor-open
+        - stream: facerec-cutout
+        - stream: person-cutout
+        - stream: extended-occupancy
+        # ALERT PROCESSING
+        - stream: update-alerts
+
+      file-transfer:
+        defaults:
+          image:
+            tag: dev-c0862d1
+    
+          labels:
+            deviceID: "demonstrator-se"
+            teamspace: "demonstrations"
+            domain: "teknoir.dev"
+    
+      # DEBUG NOT FOR PRODUCTION
+      clickhouse:
+        nodePort:
+          enabled: true
+      keydb:
+        nodePort:
+          enabled: true
+      seaweedfs:
+        master:
+          nodePort: 31483
+          nodePortGrpc: 31493
+          volumeSizeLimitMB: 1000
+        filer:
+          nodePort: 31488
+          nodePortGrpc: 31498
+        volume:
+          nodePort: 31481
+          nodePortGrpc: 31491
+          dataDirs:
+            - name: data
+              type: "hostPath"
+              maxVolumes: 300

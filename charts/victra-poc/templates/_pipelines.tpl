@@ -4,9 +4,19 @@
 {{- template "defaultMQTT" . }}
 {{- end }}
 
+
 {{- define "defaultPipeline" }}
 {{- template "defaultRTSPSrc" . }}
 {{- template "defaultInference" . }}
+{{- template "defaultMQTT" . }}
+{{- template "defaultMotionCells" . }}
+{{- template "defaultVideoRecorder" . }}
+{{- end }}
+
+
+{{- define "batch1Pipeline" }}
+{{- template "defaultRTSPSrc" . }}
+{{- template "batch1Inference" . }}
 {{- template "defaultMQTT" . }}
 {{- template "defaultMotionCells" . }}
 {{- template "defaultVideoRecorder" . }}
@@ -26,6 +36,15 @@
 {{- define "default360Pipeline" }}
 {{- template "defaultRTSPSrc" . }}
 {{- template "nvdsdewarperInference" . }}
+{{- template "defaultMQTT" . }}
+{{- template "defaultMotionCells" . }}
+{{- template "defaultVideoRecorder" . }}
+{{- end }}
+
+
+{{- define "360Batch1Pipeline" }}
+{{- template "defaultRTSPSrc" . }}
+{{- template "nvdsdewarperBatch1Inference" . }}
 {{- template "defaultMQTT" . }}
 {{- template "defaultMotionCells" . }}
 {{- template "defaultVideoRecorder" . }}
