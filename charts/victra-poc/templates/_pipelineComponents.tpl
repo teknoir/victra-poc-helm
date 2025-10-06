@@ -22,11 +22,6 @@ src.
     ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width={{- template "nvstreammuxWidth" . }} height={{- template "nvstreammuxHeight" . }}
 {{- end }}
 
-{{- define "nvStreamMuxBatch1" }}
-src.
-    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "nvstreammuxWidth" . }},height={{- template "nvstreammuxHeight" . }}
-    ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=1 width={{- template "nvstreammuxWidth" . }} height={{- template "nvstreammuxHeight" . }}
-{{- end }}
 
 {{- define "nvdsdewarperNvStreamMux" }}
 src.
@@ -35,12 +30,6 @@ src.
     ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width={{- template "nvstreammuxWidth" . }} height={{- template "nvstreammuxHeight" . }}
 {{- end }}
 
-{{- define "nvdsdewarperNvStreamMuxBatch1" }}
-src.
-    ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
-    ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "nvstreammuxWidth" . }},height={{- template "nvstreammuxHeight" . }}
-    ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=1 width={{- template "nvstreammuxWidth" . }} height={{- template "nvstreammuxHeight" . }}
-{{- end }}
 
 {{- define "defaultNvTracker" }}
     ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0
@@ -81,13 +70,6 @@ tee.
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
-{{- define "batch1Inference" }}
-{{- template "nvStreamMuxBatch1" . }}
-{{- template "defaultNvInferServer" . }}
-{{- template "defaultNvDCFPerfTracker" . }}
-{{- template "defaultNvStreamDemux" . }}
-{{- end }}
-
 {{- define "noInference" }}
 {{- template "defaultNvStreamMux" . }}
 {{- template "defaultNvStreamDemux" . }}
@@ -95,13 +77,6 @@ tee.
 
 {{- define "nvdsdewarperInference" }}
 {{- template "nvdsdewarperNvStreamMux" . }}
-{{- template "defaultNvInferServer" . }}
-{{- template "defaultNvDCFPerfTracker" . }}
-{{- template "defaultNvStreamDemux" . }}
-{{- end }}
-
-{{- define "nvdsdewarperBatch1Inference" }}
-{{- template "nvdsdewarperNvStreamMuxBatch1" . }}
 {{- template "defaultNvInferServer" . }}
 {{- template "defaultNvDCFPerfTracker" . }}
 {{- template "defaultNvStreamDemux" . }}

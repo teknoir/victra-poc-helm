@@ -23,7 +23,7 @@ spec:
             inactiveInterval: 600
             # Number of frames to skip inference when motion is detected
             activeInterval: 1          
-          pipeline: "{{ template \"batch1Pipeline\" . }}"
+          pipeline: "{{ template \"defaultPipeline\" . }}"
           pipelineValues:
             videoRecorder:
               segmentCount: 864
@@ -39,7 +39,7 @@ spec:
         - name: demonstrator-se-rb1
           camera:
             uri: rtsp://mediamtx:8554/nc0051-robbery1
-            pipeline: "{{ template \"360Batch1Pipeline\" . }}"
+            pipeline: "{{ template \"default360Pipeline\" . }}"
             pipelineValues:
               rtspSrc:
                   width: 4000
@@ -55,7 +55,7 @@ spec:
         - name: demonstrator-se-rb2
           camera:
             uri: rtsp://mediamtx:8554/nc0051-robbery2
-            pipeline: "{{ template \"360Batch1Pipeline\" . }}"
+            pipeline: "{{ template \"default360Pipeline\" . }}"
             pipelineValues:
               rtspSrc:
                   width: 4000
