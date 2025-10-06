@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.1.2-beta.1
+  version: 0.1.2-beta.4
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -394,7 +394,7 @@ spec:
         debugLevel: DEBUG
 
         image:
-          tag: feature-lc-hack-burst-mode-0836e2f
+          tag: dev-89de145
       
         labels:
           deviceID: "victra-poc-02"

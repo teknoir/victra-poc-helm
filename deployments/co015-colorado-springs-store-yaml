@@ -1,0 +1,541 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: co015-colorado-springs-store
+  namespace: default
+spec:
+  repo: https://teknoir.github.io/victra-poc-helm
+  chart: victra-poc
+  version: 0.1.2-beta.4
+  targetNamespace: default
+  valuesContent: |-
+    nvr:
+      defaults:
+        debugLevel: DEBUG
+
+        image:
+          # segment counter
+          tag: ds7.1-gst1.24.12-local-20250625-220847
+
+        camera:
+          motion:
+            inactiveInterval: 600
+            activeInterval: 1
+          pipeline_file: |-
+            filesrc location={{.uri}} name=unmappedsrc
+            unmappedsrc. ! qtdemux ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+
+            src.
+              ! queue ! nvvideoconvert
+              ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+              ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=3456,height=2688,pixel-aspect-ratio=1/1
+              ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=3456 height=2688
+              ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=0
+              ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
+              ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
+              ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+              ! queue ! nvstreamdemux name=nvdemux
+            nvdemux.src_0
+              ! queue ! tee name=tee
+            tee.
+              ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+              ! queue ! nvvideoconvert ! queue
+              ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink
+            tee.
+              ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1
+              ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink
+            tee.
+              ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080
+              ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1
+              ! queue ! nvvideoconvert
+              ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 idrinterval=10
+              ! queue ! h264parse ! queue ! splitmuxsink sink=nvdsfilesink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true start-index=START_INDEX_RUNTIME_REPLACEMENT location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=288 name=splitmux
+
+          pipeline_old: |-
+            uridecodebin3 uri={{.uri}}
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=3456,height=2592
+                ! queue name=src
+
+            src.
+              ! queue ! nvvideoconvert
+              ! queue ! nvdewarper config-file=/app/nvdewarper_config/config_nvdewarper.txt
+              ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=3456,height=2592,pixel-aspect-ratio=1/1
+              ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=3456 height=2592
+              ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=0
+              ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
+              ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
+              ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+              ! queue ! nvstreamdemux name=nvdemux
+            nvdemux.src_0
+              ! queue ! tee name=tee
+            tee.
+              ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080,pixel-aspect-ratio=1/1
+              ! queue ! nvvideoconvert ! queue
+              ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink
+            tee.
+              ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1
+              ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink
+            tee.
+              ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080
+              ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1
+              ! queue ! nvvideoconvert
+              ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 idrinterval=10
+              ! queue ! h264parse ! queue ! splitmuxsink sink=nvdsfilesink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true start-index=START_INDEX_RUNTIME_REPLACEMENT location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=288 name=splitmux
+
+          pipeline: "{{ template \"default360Pipeline\" . }}"
+          pipelineValues:
+            videoRecorder:
+              segmentCount: 864
+            rtspSrc:
+              width: 4000
+              height: 3000
+
+        nvdewarper:
+          enabled: true
+          config: |-
+            [property]
+            enable=1
+            source-id=0
+            output-width={{- template "nvdewarperWidth" . }}
+            output-height={{- template "nvdewarperHeight" . }}
+            num-batch-buffers=1
+            [surface0]
+            surface-index=0
+            projection-type=1
+            width={{- template "nvdewarperWidth" . }}
+            height={{- template "nvdewarperHeight" . }}
+            rot-axes=ZXY
+            pitch={{- template "nvdewarperPitch" . }}
+            yaw={{- template "nvdewarperYaw" . }}
+            roll={{- template "nvdewarperRoll" . }}
+            src-fov=180
+            src-x0=2000
+            src-y0=1500
+            focal-length=960
+            distortion=0;0;0;0
+
+      #instances: []
+      instances:
+        - name: co015-pos-1
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-pos-1.mp4
+            uri: rtsp://mediamtx:8554/co015-pos-1
+            pipeline_file: |-
+              filesrc location={{.uri}} name=unmappedsrc
+              unmappedsrc. ! qtdemux ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+
+              src.
+                ! queue ! nvvideoconvert src-crop=\"0:0:2688:1520\" dest-crop=\"0:0:2688:1520\" ! video/x-raw(memory:NVMM),width=2688,height=1520 ! queue
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=2688 height=1520
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=0
+                ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+                ! queue ! nvstreamdemux name=nvdemux
+              nvdemux.src_0
+                ! queue ! tee name=tee
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue
+                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1
+                ! queue ! nvvideoconvert
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 idrinterval=10
+                ! queue ! h264parse ! queue ! splitmuxsink sink=nvdsfilesink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true start-index=START_INDEX_RUNTIME_REPLACEMENT location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=288 name=splitmux
+            pipeline: |-
+              uridecodebin3 uri={{.uri}} name=src
+
+              src.
+                ! queue ! nvvideoconvert src-crop=\"0:0:2688:1520\" dest-crop=\"0:0:2688:1520\" ! video/x-raw(memory:NVMM),width=2688,height=1520 ! queue
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=2688 height=1520
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=0
+                ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+                ! queue ! nvstreamdemux name=nvdemux
+              nvdemux.src_0
+                ! queue ! tee name=tee
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue
+                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1
+                ! queue ! nvvideoconvert
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 idrinterval=10
+                ! queue ! h264parse ! queue ! splitmuxsink sink=nvdsfilesink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true start-index=START_INDEX_RUNTIME_REPLACEMENT location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=288 name=splitmux
+            pipelineValues:
+              rtspSrc:
+                width: 2688
+                height: 1520
+
+        - name: co015-pos-2
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-pos-2.mp4
+            uri: rtsp://mediamtx:8554/co015-pos-2
+            pipeline_file: |-
+              filesrc location={{.uri}} name=unmappedsrc
+              unmappedsrc. ! qtdemux ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+
+              src.
+                ! queue ! nvvideoconvert src-crop=\"0:0:2688:1520\" dest-crop=\"0:0:2688:1520\" ! video/x-raw(memory:NVMM),width=2688,height=1520 ! queue
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=2688 height=1520
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=0
+                ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+                ! queue ! nvstreamdemux name=nvdemux
+              nvdemux.src_0
+                ! queue ! tee name=tee
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue
+                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1
+                ! queue ! nvvideoconvert
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 idrinterval=10
+                ! queue ! h264parse ! queue ! splitmuxsink sink=nvdsfilesink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true start-index=START_INDEX_RUNTIME_REPLACEMENT location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=288 name=splitmux
+            pipeline: |-
+              uridecodebin3 uri={{.uri}} name=src
+              src.
+                ! queue ! nvvideoconvert src-crop=\"0:0:2688:1520\" dest-crop=\"0:0:2688:1520\" ! video/x-raw(memory:NVMM),width=2688,height=1520 ! queue
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=2688 height=1520
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=0
+                ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+                ! queue ! nvstreamdemux name=nvdemux
+              nvdemux.src_0
+                ! queue ! tee name=tee
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue
+                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1
+                ! queue ! nvvideoconvert
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 idrinterval=10
+                ! queue ! h264parse ! queue ! splitmuxsink sink=nvdsfilesink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true start-index=START_INDEX_RUNTIME_REPLACEMENT location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=288 name=splitmux
+            pipelineValues:
+              rtspSrc:
+                width: 2688
+                height: 1520
+
+        - name: co015-height-strip
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-height-strip.mp4
+            uri: rtsp://mediamtx:8554/co015-height-strip
+            pipeline_file: |-
+              filesrc location={{.uri}} name=unmappedsrc
+              unmappedsrc. ! qtdemux ! h264parse config-interval=-1 ! video/x-h264,stream-format=byte-stream,alignment=au ! nvv4l2decoder name=src
+
+              src.
+                ! queue ! nvvideoconvert src-crop=\"0:0:1920:1080\" dest-crop=\"0:0:1920:1080\" ! video/x-raw(memory:NVMM),width=1920,height=1080 ! queue
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=0
+                ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+                ! queue ! nvstreamdemux name=nvdemux
+              nvdemux.src_0
+                ! queue ! tee name=tee
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue
+                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1
+                ! queue ! nvvideoconvert
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 idrinterval=10
+                ! queue ! h264parse ! queue ! splitmuxsink sink=nvdsfilesink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true start-index=START_INDEX_RUNTIME_REPLACEMENT location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=288 name=splitmux
+            pipeline_old: |-
+              uridecodebin3 uri={{.uri}} name=src
+
+              src.
+                ! queue ! nvvideoconvert src-crop=\"0:0:1920:1080\" dest-crop=\"0:0:1920:1080\" ! video/x-raw(memory:NVMM),width=1920,height=1080 ! queue
+                ! queue ! nvmux.sink_0 nvstreammux name=nvmux batch-size=4 width=1920 height=1080
+                ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=0
+                ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
+                ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
+                ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+                ! queue ! nvstreamdemux name=nvdemux
+              nvdemux.src_0
+                ! queue ! tee name=tee
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,1920],height=[1,1080],pixel-aspect-ratio=1/1
+                ! queue ! nvvideoconvert ! queue
+                ! queue ! nvjpegenc quality=75 ! appsink sync=0 name=mqttsink
+              tee.
+                ! queue ! nvvideoconvert compute-hw=GPU ! video/x-raw,format=RGB,width=[1,640],height=[1,360],pixel-aspect-ratio=1/1
+                ! queue ! motioncells threshold=0.00005 gridx=32 gridy=18 ! fakesink
+              tee.
+                ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=1920,height=1080
+                ! queue ! nvvideoconvert ! queue ! videorate ! video/x-raw,framerate=10/1
+                ! queue ! nvvideoconvert
+                ! queue ! nvv4l2h264enc copy-meta=true profile=7 control-rate=1 bitrate=3000000 iframeinterval=5 idrinterval=10
+                ! queue ! h264parse ! queue ! splitmuxsink sink=nvdsfilesink muxer-properties=properties,streamable=true,moov-relocation=true send-keyframe-requests=true start-index=START_INDEX_RUNTIME_REPLACEMENT location=/app/videos/{{.camera_id}}_%05d.mp4 max-size-time=15000000000 max-files=288 name=splitmux
+            pipeline: "{{ template \"defaultPipeline\" . }}"
+            pipelineValues:
+              rtspSrc:
+                width: 1920
+                height: 1080
+
+        - name: co015-backroom-safe-door-0
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-backroom-safe-door.mp4
+            uri: rtsp://mediamtx:8554/co015-backroom-safe-door
+            pipelineValues:
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarperValues:
+            pitch: 30
+            roll: 0
+
+        - name: co015-backroom-safe-door-90
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-backroom-safe-door.mp4
+            uri: rtsp://mediamtx:8554/co015-backroom-safe-door
+            pipelineValues:
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarperValues:
+            pitch: 40
+            roll: 90
+
+        - name: co015-backroom-safe-door-180
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-backroom-safe-door.mp4
+            uri: rtsp://mediamtx:8554/co015-backroom-safe-door
+            pipelineValues:
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarperValues:
+            pitch: 30
+            roll: 180
+
+        - name: co015-backroom-safe-door-270
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-backroom-safe-door.mp4
+            uri: rtsp://mediamtx:8554/co015-backroom-safe-door
+            pipelineValues:
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarperValues:
+            pitch: 40
+            roll: 270
+
+        - name: co015-sales-floor-0
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-sales-floor.mp4
+            uri: rtsp://mediamtx:8554/co015-sales-floor
+            pipelineValues:
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarperValues:
+            pitch: 40
+            roll: 0
+
+
+        - name: co015-sales-floor-90
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-sales-floor.mp4
+            uri: rtsp://mediamtx:8554/co015-sales-floor
+            pipelineValues:
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarperValues:
+            pitch: 40
+            roll: 90
+
+        - name: co015-sales-floor-180
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-sales-floor.mp4
+            uri: rtsp://mediamtx:8554/co015-sales-floor
+            pipelineValues:
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarperValues:
+            pitch: 40
+            roll: 180
+
+        - name: co015-sales-floor-270
+          camera:
+            #uri: /app/videos/victra-live-robbery/co015-sales-floor.mp4
+            uri: rtsp://mediamtx:8554/co015-sales-floor
+            pipelineValues:
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarperValues:
+            pitch: 40
+            roll: 270
+
+    observatory-pipeline:
+      defaults:
+        debugLevel: DEBUG
+
+        alerts:
+          alertHeatmapAlertsToFilter: "loitering"
+          alertHeatmapHardSupression: true
+          alertHeatmapEnabled: true
+
+        image:
+          tag: dev-89de145
+
+        labels:
+          deviceID: "victra-poc-vm02-demo"
+
+        roiStreamConfig:
+          enabled: true
+          peripherals:
+
+            - name: co015-height-strip
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+            - name: co015-backroom-safe-door-0
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+            - name: co015-backroom-safe-door-90
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+              lc-config:
+                lc-back-room-Entry-0: "1354;502;1344;702;1171;693;1517;710"
+                lc-back-room-Exit-0: "1334;901;1344;702;1517;710;1171;693"
+
+            - name: co015-backroom-safe-door-180
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+              lc-config:
+                lc-back-room-Entry-0: "837;626;827;826;702;819;952;832"
+                lc-back-room-Exit-0: "817;1025;827;826;952;832;702;819"
+
+            - name: co015-backroom-safe-door-270
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+            - name: co015-sales-floor-0
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+            - name: co015-sales-floor-90
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+            - name: co015-sales-floor-180
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+            - name: co015-sales-floor-270
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+      streams:
+        - stream: update-frame-rate-control
+        #- stream: record-detections
+        #- stream: update-movements
+        # ALERTS
+        - stream: loitering
+        - stream: person-down
+        - stream: line-crossing
+        - stream: hands-up
+        - stream: running
+        - stream: face-cover
+        - stream: weapons
+          weaponsDetection:
+            scoreThreshold: 0.25
+            window: 1
+        - stream: safe-open
+        - stream: backdoor-open
+        - stream: facerec-cutout
+        - stream: person-cutout
+        - stream: pos-event
+          video:
+            segmentRetentionLength: 8640
+        - stream: alarm-event
+        - stream: unauthorized-entry
+        - stream: face-cover-detections
+          faceCoverDetection:
+            threshold: 0.8
+            windowSize: 5000
+            slidingInterval: 500
+        - stream: extended-occupancy
+        # ALERT PROCESSING
+        - stream: update-alerts
+          video:
+            segmentRetentionLength: 8640
+
+      file-transfer:
+        defaults:
+          image:
+            tag: dev-c0862d1
+          labels:
+            deviceID: "victra-poc-vm02-demo"
+
+      # Limit Image Cache to 30GB
+      seaweedfs:
+        master:
+          volumeSizeLimitMB: 100
+
+        volume:
+          dataDirs:
+            - name: data
+              type: "hostPath"
+              maxVolumes: 300
+
+      # DEBUG NOT FOR PRODUCTION
+      clickhouse:
+        nodePort:
+          enabled: true
+      keydb:
+        nodePort:
+          enabled: true

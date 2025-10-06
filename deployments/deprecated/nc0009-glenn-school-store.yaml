@@ -2,12 +2,12 @@
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
-  name: nc0211-lexington-store
+  name: nc0009-glenn-school-store
   namespace: default
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.1.2-beta.4
+  version: 0.1.2-beta.1
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -20,62 +20,18 @@ spec:
 
         camera:
           pipeline: "{{ template \"defaultPipeline\" . }}"
-
+  
       instances:
-        - name: nc0211-pos
+        - name: nc0009-pos
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.113/stream1
             pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
             pipelineValues:
               videoRecorder:
                 segmentCount: 8640
-          nvdsanalytics:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              config-width=1920
-              config-height=1080
-              osd-mode=0
-              display-font-size=25
-    
-              [roi-filtering-stream-0]
-              enable=1
-              roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
-
-        - name: nc0211-height-strip
-          camera:
-            uri: rtsp://admin:Redex1997!@192.168.51.112/live.sdp
-            pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
-            pipelineValues:
-              videoRecorder:
-                segmentCount: 8640
-          nvdsanalytics:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              config-width=1920
-              config-height=1080
-              osd-mode=0
-              display-font-size=25
-    
-              [roi-filtering-stream-0]
-              enable=1
-              roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
-
-        - name: nc0211-front-door-1
-          camera:
-            motion:
-              activeInterval: "0"
-            uri: rtsp://admin:Redex1997!@192.168.51.117/stream1
-            pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
-            pipelineValues:
-              videoRecorder:
-                segmentCount: 8640
               rtspSrc:
-                width: 2560
-                height: 1440
+                width: 2688
+                height: 1520
           nvdsanalytics:
             enabled: true
             configFormat: yaml
@@ -86,84 +42,22 @@ spec:
                 config-height: 1080
                 osd-mode: 0
                 display-font-size: 25
-                obj-cnt-win-in-ms: 25
 
               roi-filtering-stream-0:
                 enable: 1
-                roi-loitering-Exclusion-Zone-0: "0;0;425;0;406;472;726;499;719;698;1920;779;1920;1080;0;1090"
-              line-crossing-stream-0:
-                enable: 1
-                extended: 0
-                mode: balanced
-                line-crossing-Entry-0: "879;497;862;697;762;688;962;705"
-                line-crossing-Exit-0: "844;896;862;697;962;705;762;688"
-
-        - name: nc0211-front-door-2
+                roi-loitering-Exclusion-Zone-0: "0;0;20;0;65;279;433;111;425;38;462;0;540;0;612;46;785;0;1920;0;1920;1080;0;1080"
+                roi-face_cover-Exclusion-Zone-1: "1306;2;1306;44;1634;42;1634;1"
+  
+        - name: nc0009-back-door
           camera:
-            motion:
-              activeInterval: "0"
-            uri: rtsp://admin:Redex1997!@192.168.51.116/live.sdp
+            uri: rtsp://admin:Redex1997!@192.168.51.116/stream1
             pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
             pipelineValues:
               videoRecorder:
                 segmentCount: 8640
               rtspSrc:
-                width: 2560
-                height: 1440
-          nvdsanalytics:
-            enabled: true
-            configFormat: yaml
-            config: |
-              property:
-                enable: 1
-                config-width: 1920
-                config-height: 1080
-                osd-mode: 0
-                display-font-size: 25
-                obj-cnt-win-in-ms: 25
-
-              roi-filtering-stream-0:
-                enable: 1
-                roi-loitering-Exclusion-Zone-0: "0;639;274;644;218;87;452;41;479;654;1129;650;1142;470;1498;471;1526;0;1920;0;1920;1080;0;1080"
-              line-crossing-stream-0:
-                enable: 1
-                extended: 0
-                mode: balanced
-                line-crossing-Entry-0: "1004;413;1007;613;910;615;1104;612"
-                line-crossing-Exit-0: "1010;813;1007;613;1104;612;910;615"
-    
-        #- name: nc0211-backroom-safe-door-0
-        #  camera:
-        #    uri: rtsp://admin:Redex1997!@192.168.51.115/stream1
-        #    pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
-        #    pipelineValues:
-        #      rtspSrc:
-        #        width: 4000
-        #        height: 3000
-        #  nvdewarper:
-        #    enabled: true
-        #    config: "{{ template \"360NvDeWarper\" . }}"
-        #  nvdewarperValues:
-        #    pitch: 30
-        #    roll: 0
-    
-    
-        - name: nc0211-backroom-safe-door-90
-          camera:
-            uri: rtsp://admin:Redex1997!@192.168.51.115/stream1
-            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
-            pipelineValues:
-              videoRecorder:
-                segmentCount: 8640
-              rtspSrc:
-                width: 4000
-                height: 3000
-          nvdewarper:
-            enabled: true
-            config: "{{ template \"360NvDeWarper\" . }}"
-          nvdewarperValues:
-            pitch: 30
-            roll: 90
+                width: 2688
+                height: 1520
           nvdsanalytics:
             enabled: true
             configFormat: yaml
@@ -182,66 +76,21 @@ spec:
               line-crossing-stream-0:
                 enable: 1
                 extended: 0
-                mode: balanced
-                line-crossing-back-room-Entry-0: "1354;502;1344;702;1171;693;1517;710"
-                line-crossing-back-room-Exit-0: "1334;901;1344;702;1517;710;1171;693"
-
-
-        - name: nc0211-backroom-safe-door-180
+                line-crossing-back-room-Entry-0: "705;586;745;782;590;813;899;750"
+                line-crossing-back-room-Exit-0: "784;978;745;782;899;750;590;813"
+  
+        - name: nc0009-front-door
           camera:
-            uri: rtsp://admin:Redex1997!@192.168.51.115/stream1
-            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
+            motion:
+              activeInterval: "0"
+            uri: rtsp://admin:Redex1997!@192.168.51.111/stream1
+            pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
             pipelineValues:
               videoRecorder:
                 segmentCount: 8640
               rtspSrc:
-                width: 4000
-                height: 3000
-          nvdewarper:
-            enabled: true
-            config: "{{ template \"360NvDeWarper\" . }}"
-          nvdewarperValues:
-            pitch: 50
-            roll: 180
-          nvdsanalytics:
-            enabled: true
-            configFormat: yaml
-            config: |
-              property:
-                enable: 1
-                config-width: 1920
-                config-height: 1080
-                osd-mode: 0
-                display-font-size: 25
-                obj-cnt-win-in-ms: 25
-
-              roi-filtering-stream-0:
-                enable: 1
-                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
-              line-crossing-stream-0:
-                enable: 1
-                extended: 0
-                mode: balanced
-                line-crossing-back-room-Entry-0: "837;626;827;826;702;819;952;832"
-                line-crossing-back-room-Exit-0: "817;1025;827;826;952;832;702;819"
-    
-    
-        - name: nc0211-backroom-safe-door-270
-          camera:
-            uri: rtsp://admin:Redex1997!@192.168.51.115/stream1
-            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
-            pipelineValues:
-              videoRecorder:
-                segmentCount: 8640
-              rtspSrc:
-                width: 4000
-                height: 3000
-          nvdewarper:
-            enabled: true
-            config: "{{ template \"360NvDeWarper\" . }}"
-          nvdewarperValues:
-            pitch: 30
-            roll: 270
+                width: 2560
+                height: 1440
           nvdsanalytics:
             enabled: true
             config: |
@@ -251,13 +100,33 @@ spec:
               config-height=1080
               osd-mode=0
               display-font-size=25
-    
+
+              [roi-filtering-stream-0]
+              enable=1
+              roi-loitering-Exclusion-Zone-0=0;689;758;800;1122;824;1586;827;1920;792;1920;1080;0;1080
+
+        - name: nc0009-height-strip
+          camera:
+            uri: rtsp://root:Redex1997!@192.168.51.117/live1s1.sdp
+            pipeline: "{{ template \"nvdsanalyticsPipeline\" . }}"
+            pipelineValues:
+              videoRecorder:
+                segmentCount: 8640
+          nvdsanalytics:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              config-width=1920
+              config-height=1080
+              osd-mode=0
+              display-font-size=25
+              
               [roi-filtering-stream-0]
               enable=1
               roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
-    
-    
-        - name: nc0211-safe-back-door-0
+
+        - name: nc0009-backroom-safe-0
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
             pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
@@ -282,132 +151,15 @@ spec:
               config-height=1080
               osd-mode=0
               display-font-size=25
-    
+              
               [roi-filtering-stream-0]
               enable=1
               roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
-    
-    
-        #- name: nc0211-safe-back-door-90
-        #  camera:
-        #    uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
-        #    pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
-        #    pipelineValues:
-        #      rtspSrc:
-        #        width: 4000
-        #        height: 3000
-        #  nvdewarper:
-        #    enabled: true
-        #    config: "{{ template \"360NvDeWarper\" . }}"
-        #  nvdewarperValues:
-        #    pitch: 30
-        #    roll: 90
-    
-    
-        - name: nc0211-safe-back-door-180
+
+
+        - name: nc0009-backroom-safe-90
           camera:
             uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
-            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
-            pipelineValues:
-              videoRecorder:
-                segmentCount: 8640
-              rtspSrc:
-                width: 4000
-                height: 3000
-          nvdewarper:
-            enabled: true
-            config: "{{ template \"360NvDeWarper\" . }}"
-          nvdewarperValues:
-            pitch: 30
-            roll: 180
-          nvdsanalytics:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              config-width=1920
-              config-height=1080
-              osd-mode=0
-              display-font-size=25
-    
-              [roi-filtering-stream-0]
-              enable=1
-              roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
-    
-    
-        - name: nc0211-safe-back-door-270
-          camera:
-            uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
-            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
-            pipelineValues:
-              videoRecorder:
-                segmentCount: 8640
-              rtspSrc:
-                width: 4000
-                height: 3000
-          nvdewarper:
-            enabled: true
-            config: "{{ template \"360NvDeWarper\" . }}"
-          nvdewarperValues:
-            pitch: 40
-            roll: 270
-          nvdsanalytics:
-            enabled: true
-            configFormat: yaml
-            config: |
-              property:
-                enable: 1
-                config-width: 1920
-                config-height: 1080
-                osd-mode: 0
-                display-font-size: 25
-                obj-cnt-win-in-ms: 25
-
-              roi-filtering-stream-0:
-                enable: 1
-                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
-              line-crossing-stream-0:
-                enable: 1
-                extended: 0
-                mode: balanced
-                line-crossing-back-room-Entry-0: "920;428;874;622;746;592;1002;653"
-                line-crossing-back-room-Exit-0: "827;817;874;622;1002;653;746;592"
-    
-    
-        - name: nc0211-sales-floor-0
-          camera:
-            uri: rtsp://admin:Redex1997!@192.168.51.111/stream1
-            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
-            pipelineValues:
-              videoRecorder:
-                segmentCount: 8640
-              rtspSrc:
-                width: 4000
-                height: 3000
-          nvdewarper:
-            enabled: true
-            config: "{{ template \"360NvDeWarper\" . }}"
-          nvdewarperValues:
-            pitch: 50
-            roll: 0
-          nvdsanalytics:
-            enabled: true
-            config: |
-              [property]
-              enable=1
-              config-width=1920
-              config-height=1080
-              osd-mode=0
-              display-font-size=25
-    
-              [roi-filtering-stream-0]
-              enable=1
-              roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
-
-
-        - name: nc0211-sales-floor-90
-          camera:
-            uri: rtsp://admin:Redex1997!@192.168.51.111/stream1
             pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
             pipelineValues:
               videoRecorder:
@@ -430,15 +182,15 @@ spec:
               config-height=1080
               osd-mode=0
               display-font-size=25
-    
+              
               [roi-filtering-stream-0]
               enable=1
-              roi-loitering-Exclusion-Zone-0=0;0;262;0;297;100;465;102;498;212;873;214;863;0;1054;0;1046;207;1433;215;1466;108;1663;111;1706;0;1920;0;1920;1080;0;1080
+              roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
+
     
-    
-        - name: nc0211-sales-floor-180
+        - name: nc0009-backroom-safe-180
           camera:
-            uri: rtsp://admin:Redex1997!@192.168.51.111/stream1
+            uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
             pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
             pipelineValues:
               videoRecorder:
@@ -454,22 +206,29 @@ spec:
             roll: 180
           nvdsanalytics:
             enabled: true
+            configFormat: yaml
             config: |
-              [property]
-              enable=1
-              config-width=1920
-              config-height=1080
-              osd-mode=0
-              display-font-size=25
-    
-              [roi-filtering-stream-0]
-              enable=1
-              roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
+              property:
+                enable: 1
+                config-width: 1920
+                config-height: 1080
+                osd-mode: 0
+                display-font-size: 25
+                obj-cnt-win-in-ms: 25
+
+              roi-filtering-stream-0:
+                enable: 1
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+              line-crossing-stream-0:
+                enable: 1
+                extended: 0
+                line-crossing-back-room-Entry-0: "892;452;883;652;794;648;973;656"
+                line-crossing-back-room-Exit-0: "874;852;883;652;973;656;794;648"
 
 
-        - name: nc0211-sales-floor-270
+        - name: nc0009-backroom-safe-270
           camera:
-            uri: rtsp://admin:Redex1997!@192.168.51.111/stream1
+            uri: rtsp://admin:Redex1997!@192.168.51.114/stream1
             pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
             pipelineValues:
               videoRecorder:
@@ -492,123 +251,240 @@ spec:
               config-height=1080
               osd-mode=0
               display-font-size=25
-    
+
+              [roi-filtering-stream-0]
+              enable=1
+              roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
+  
+        - name: nc0009-salefloor-0
+          camera:
+            uri: rtsp://admin:Redex1997!@192.168.51.112/stream1
+            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
+            pipelineValues:
+              videoRecorder:
+                segmentCount: 8640
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 50
+            roll: 0
+          nvdsanalytics:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              config-width=1920
+              config-height=1080
+              osd-mode=0
+              display-font-size=25
+              
+              [roi-filtering-stream-0]
+              enable=1
+              roi-loitering-Exclusion-Zone-0=0;865;484;274;407;0;1920;0;1920;1080;0;1080
+
+
+        - name: nc0009-salefloor-90
+          camera:
+            uri: rtsp://admin:Redex1997!@192.168.51.112/stream1
+            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
+            pipelineValues:
+              videoRecorder:
+                segmentCount: 8640
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 50
+            roll: 90
+          nvdsanalytics:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              config-width=1920
+              config-height=1080
+              osd-mode=0
+              display-font-size=25
+              
               [roi-filtering-stream-0]
               enable=1
               roi-loitering-Exclusion-Zone-0=0;0;1920;0;1920;1080;0;1080
 
+
+        - name: nc0009-salefloor-180
+          camera:
+            uri: rtsp://admin:Redex1997!@192.168.51.112/stream1
+            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
+            pipelineValues:
+              videoRecorder:
+                segmentCount: 8640
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 50
+            roll: 180
+          nvdsanalytics:
+            enabled: true
+            config: |
+              [property]
+              enable=1
+              config-width=1920
+              config-height=1080
+              osd-mode=0
+              display-font-size=25
+              
+              [roi-filtering-stream-0]
+              enable=1
+              roi-loitering-Exclusion-Zone-0=0;0;1903;0;1689;441;1920;766;1920;1080;0;1080
+
+
+        - name: nc0009-salefloor-270
+          camera:
+            motion:
+              activeInterval: "0" # Has to be a string or it is interpreted as null
+            uri: rtsp://admin:Redex1997!@192.168.51.112/stream1
+            pipeline: "{{ template \"nvdsanalytics360Pipeline\" . }}"
+            pipelineValues:
+              videoRecorder:
+                segmentCount: 8640
+              rtspSrc:
+                width: 4000
+                height: 3000
+          nvdewarper:
+            enabled: true
+            config: "{{ template \"360NvDeWarper\" . }}"
+          nvdewarperValues:
+            pitch: 50
+            roll: 270
+          nvdsanalytics:
+            enabled: true
+            configFormat: yaml
+            config: |
+              property:
+                enable: 1
+                config-width: 1920
+                config-height: 1080
+                osd-mode: 0
+                display-font-size: 25
+                obj-cnt-win-in-ms: 25
+
+              roi-filtering-stream-0:
+                enable: 1
+                roi-loitering-Exclusion-Zone-0: "0;0;68;0;68;49;353;472;1920;532;1920;1080;0;1080"
+              line-crossing-stream-0:
+                enable: 1
+                extended: 0
+                mode: balanced
+                line-crossing-Entry-0: "1180;284;1171;484;1082;480;1259;488"
+                line-crossing-Exit-0: "1161;683;1171;484;1259;488;1082;480"
+    
     observatory-pipeline:
       defaults:
         debugLevel: DEBUG
 
         image:
-          tag: dev-89de145
-
+          tag: feature-lc-hack-burst-mode-0836e2f
+      
         labels:
-          deviceID: "victra-poc-03"
+          deviceID: "victra-poc-02"
 
         roiStreamConfig:
           enabled: true
           peripherals:
-            - name: nc0211-pos
+            - name: nc0009-pos
               config-width: 1920
               config-height: 1080
               roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+                roi-loitering-Exclusion-Zone-0: "0;0;20;0;65;279;433;111;425;38;462;0;540;0;612;46;785;0;1920;0;1920;1080;0;1080"
+                roi-face_cover-Exclusion-Zone-1: "1306;2;1306;44;1634;42;1634;1"
 
-            - name: nc0211-height-strip
-              config-width: 1920
-              config-height: 1080
-              roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
-
-            - name: nc0211-front-door-1
-              config-width: 1920
-              config-height: 1080
-              roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;0;425;0;406;472;726;499;719;698;1920;779;1920;1080;0;1090"
-              lc-config:
-                lc-Entry-0: "879;497;862;697;762;688;962;705"
-                lc-Exit-0: "844;896;862;697;962;705;762;688"
-
-            - name: nc0211-front-door-2
-              config-width: 1920
-              config-height: 1080
-              roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;639;274;644;218;87;452;41;479;654;1129;650;1142;470;1498;471;1526;0;1920;0;1920;1080;0;1080"
-              lc-config:
-                lc-Entry-0: "1004;413;1007;613;910;615;1104;612"
-                lc-Exit-0: "1010;813;1007;613;1104;612;910;615"
-
-            - name: nc0211-backroom-safe-door-90
+            - name: nc0009-back-door
               config-width: 1920
               config-height: 1080
               roi-config:
                 roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
               lc-config:                
-                lc-back-room-Entry-0: "1354;502;1344;702;1171;693;1517;710"
-                lc-back-room-Exit-0: "1334;901;1344;702;1517;710;1171;693"
+                lc-back-room-Entry-0: "705;586;745;782;590;813;899;750"
+                lc-back-room-Exit-0: "784;978;745;782;899;750;590;813"
 
-            - name: nc0211-backroom-safe-door-180
+            - name: nc0009-front-door
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;689;758;800;1122;824;1586;827;1920;792;1920;1080;0;1080"
+                roi-face_cover-Exclusion-Zone-1: "0;0;0;500;1920;500;1920;0"
+
+            - name: nc0009-height-strip
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+            - name: nc0009-backroom-safe-0
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+            - name: nc0009-backroom-safe-90
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+
+            - name: nc0009-backroom-safe-180
               config-width: 1920
               config-height: 1080
               roi-config:
                 roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
               lc-config:
-                lc-back-room-Entry-0: "837;626;827;826;702;819;952;832"
-                lc-back-room-Exit-0: "817;1025;827;826;952;832;702;819"
+                lc-back-room-Entry-0: "892;452;883;652;794;648;973;656"
+                lc-back-room-Exit-0: "874;852;883;652;973;656;794;648"
 
-            - name: nc0211-backroom-safe-door-270
+            - name: nc0009-backroom-safe-270
               config-width: 1920
               config-height: 1080
               roi-config:
                 roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
 
-            - name: nc0211-safe-back-door-0
+            - name: nc0009-salefloor-0
+              config-width: 1920
+              config-height: 1080
+              roi-config:
+                roi-loitering-Exclusion-Zone-0: "0;865;484;274;407;0;1920;0;1920;1080;0;1080"
+
+            - name: nc0009-salefloor-90
               config-width: 1920
               config-height: 1080
               roi-config:
                 roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
 
-            - name: nc0211-safe-back-door-180
+            - name: nc0009-salefloor-180
               config-width: 1920
               config-height: 1080
               roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+                roi-loitering-Exclusion-Zone-0: "0;0;1903;0;1689;441;1920;766;1920;1080;0;1080"
 
-            - name: nc0211-safe-back-door-270
+            - name: nc0009-salefloor-270
               config-width: 1920
               config-height: 1080
               roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+                roi-loitering-Exclusion-Zone-0: "0;0;68;0;68;49;353;472;1920;532;1920;1080;0;1080"
               lc-config:
-                lc-back-room-Entry-0: "920;428;874;622;746;592;1002;653"
-                lc-back-room-Exit-0: "827;817;874;622;1002;653;746;592"
-
-            - name: nc0211-sales-floor-0
-              config-width: 1920
-              config-height: 1080
-              roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
-
-            - name: nc0211-sales-floor-90
-              config-width: 1920
-              config-height: 1080
-              roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;0;262;0;297;100;465;102;498;212;873;214;863;0;1054;0;1046;207;1433;215;1466;108;1663;111;1706;0;1920;0;1920;1080;0;1080"
-
-            - name: nc0211-sales-floor-180
-              config-width: 1920
-              config-height: 1080
-              roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
-
-            - name: nc0211-sales-floor-270
-              config-width: 1920
-              config-height: 1080
-              roi-config:
-                roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
-
+                lc-Entry-0: "1180;284;1171;484;1082;480;1259;488"
+                lc-Exit-0: "1161;683;1171;484;1259;488;1082;480"
+      
       streams:
         - stream: update-frame-rate-control
         - stream: record-detections
@@ -655,8 +531,8 @@ spec:
           image:
             tag: dev-c0862d1
           labels:
-            deviceID: "victra-poc-03"
-    
+            deviceID: "victra-poc-02"
+
       # DEBUG NOT FOR PRODUCTION
       clickhouse:
         nodePort:
