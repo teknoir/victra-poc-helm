@@ -71,7 +71,7 @@ observatory-pipeline:
     debugLevel: INFO
 
     image:
-      tag: dev-bf9da9d
+      tag: dev-44196e8
 
     labels:
       teamspace: "victra-poc"
