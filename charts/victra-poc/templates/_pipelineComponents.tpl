@@ -32,7 +32,7 @@ src.
 
 
 {{- define "defaultNvTracker" }}
-    ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDeepSORT.yml compute-hw=2 gpu-id=0
+    ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDeepSORT.yml compute-hw=1 gpu-id=0
 {{- end }}
 
 
