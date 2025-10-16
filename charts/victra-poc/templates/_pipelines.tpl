@@ -14,6 +14,15 @@
 {{- end }}
 
 
+{{- define "defaultPipelineDefaultTracker" }}
+{{- template "defaultRTSPSrc" . }}
+{{- template "defaultInferenceDefaultTracker" . }}
+{{- template "defaultMQTT" . }}
+{{- template "defaultMotionCells" . }}
+{{- template "defaultVideoRecorder" . }}
+{{- end }}
+
+
 {{- define "nvdsanalyticsPipeline" }}
 {{- template "defaultRTSPSrc" . }}
 {{- template "defaultInference" . }}
