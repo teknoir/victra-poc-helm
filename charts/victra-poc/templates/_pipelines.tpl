@@ -14,9 +14,9 @@
 {{- end }}
 
 
-{{- define "defaultPipelineDefaultTracker" }}
+{{- define "defaultPipelineAccuracyTracker" }}
 {{- template "defaultRTSPSrc" . }}
-{{- template "defaultInferenceDefaultTracker" . }}
+{{- template "defaultInferenceAccuracyTracker" . }}
 {{- template "defaultMQTT" . }}
 {{- template "defaultMotionCells" . }}
 {{- template "defaultVideoRecorder" . }}

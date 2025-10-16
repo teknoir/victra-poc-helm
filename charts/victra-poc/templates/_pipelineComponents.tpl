@@ -16,6 +16,8 @@ videotestsrc is-live=true
     ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "rtspSrcWidth" . }},height={{- template "rtspSrcHeight" . }} ! queue name=src
 {{- end }}
 
+
+# MUX
 {{- define "defaultNvStreamMux" }}
 src.
     ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width={{- template "nvstreammuxWidth" . }},height={{- template "nvstreammuxHeight" . }}
@@ -31,8 +33,19 @@ src.
 {{- end }}
 
 
-{{- define "defaultNvTracker" }}
+# TRACKERS
+{{- define "defaultNvDeepSORTTracker" }}
     ! queue ! nvtracker tracker-width=640 tracker-height=384 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDeepSORT.yml compute-hw=1 gpu-id=0
+{{- end }}
+
+
+{{- define "defaultNvDCFPerfTracker" }}
+    ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+{{- end }}
+
+
+{{- define "defaultNvDCFAccuracyTracker" }}
+    ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_accuracy.yml compute-hw=1 gpu-id=0
 {{- end }}
 
 
@@ -45,16 +58,20 @@ src.
     ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_custom_sticky_NvDeepSORT_b50.yml compute-hw=1 gpu-id=0
 {{- end }}
 
-{{- define "defaultNvDCFPerfTracker" }}
-    ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_NvDCF_perf.yml compute-hw=1 gpu-id=0
+
+{{- define "defaultNvTracker" }}
+{{- template "defaultNvDCFPerfTracker" . }}
 {{- end }}
 
+
+# DEMUX
 {{- define "defaultNvStreamDemux" }}
     ! queue ! nvstreamdemux name=nvdemux nvdemux.src_0 ! queue ! tee name=tee
 tee.
 {{- end }}
 
 
+# INFERENCE
 {{- define "defaultNvInferServer" }}
     ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=15
     ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
@@ -63,24 +80,28 @@ tee.
 {{- end }}
 
 
+# PIPELINES
 {{- define "defaultInference" }}
-{{- template "defaultNvStreamMux" . }}
-{{- template "defaultNvInferServer" . }}
-{{- template "defaultNvDCFPerfTracker" . }}
-{{- template "defaultNvStreamDemux" . }}
-{{- end }}
-
-{{- define "defaultInferenceDefaultTracker" }}
 {{- template "defaultNvStreamMux" . }}
 {{- template "defaultNvInferServer" . }}
 {{- template "defaultNvTracker" . }}
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
+
+{{- define "defaultInferenceAccuracyTracker" }}
+{{- template "defaultNvStreamMux" . }}
+{{- template "defaultNvInferServer" . }}
+{{- template "defaultNvDCFAccuracyTracker" . }}
+{{- template "defaultNvStreamDemux" . }}
+{{- end }}
+
+
 {{- define "noInference" }}
 {{- template "defaultNvStreamMux" . }}
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
+
 
 {{- define "nvdsdewarperInference" }}
 {{- template "nvdsdewarperNvStreamMux" . }}
@@ -89,11 +110,15 @@ tee.
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
+
+# NVDSANALYTICS
 {{- define "defaultNvDsAnalytics" }}
     ! queue ! nvdsanalytics config-file=/app/nvdsanalytics_config/config_nvdsanalytics.{{- if and $.nvdsanalytics $.nvdsanalytics.configFormat }}{{ $.nvdsanalytics.configFormat }}{{- else if and $.Values $.Values.defaults $.Values.defaults.nvdsanalytics $.Values.defaults.nvdsanalytics.configFormat }}{{ $.Values.defaults.nvdsanalytics.configFormat }}{{- else }}txt{{- end }}
     ! queue ! nvdsosd display-bbox=0 display-text=0
 {{- end }}
 
+
+# SINKS
 {{- define "defaultMQTT" }}
     ! queue ! nvvideoconvert ! video/x-raw(memory:NVMM),width=[1,{{- template "jpegMQTTWidth" . }}],height=[1,{{- template "jpegMQTTHeight" . }}],pixel-aspect-ratio=1/1
     ! queue ! nvvideoconvert
