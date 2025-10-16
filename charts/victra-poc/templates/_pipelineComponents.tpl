@@ -70,6 +70,13 @@ tee.
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
+{{- define "defaultInferenceDefaultTracker" }}
+{{- template "defaultNvStreamMux" . }}
+{{- template "defaultNvInferServer" . }}
+{{- template "defaultNvTracker" . }}
+{{- template "defaultNvStreamDemux" . }}
+{{- end }}
+
 {{- define "noInference" }}
 {{- template "defaultNvStreamMux" . }}
 {{- template "defaultNvStreamDemux" . }}
