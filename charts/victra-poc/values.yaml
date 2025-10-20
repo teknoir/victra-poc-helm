@@ -18,6 +18,7 @@ nvr:
         image: us-docker.pkg.dev/teknoir/gcr.io/nvidia-tracker-deepstream:latest
 
     camera:
+      pipelineRetryCount: 0
       motion:
         # Number of frames to skip inference when no motion detected
         inactiveInterval: 600
