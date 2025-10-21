@@ -71,6 +71,9 @@ observatory-pipeline:
   defaults:
     debugLevel: INFO
 
+    fileTransfer:
+      blockSize: "314572800"
+
     image:
       tag: dev-44196e8
 

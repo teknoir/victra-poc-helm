@@ -7,16 +7,12 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.1.2-beta.6
+  version: 0.1.2-beta.14
   targetNamespace: default
   valuesContent: |-
     nvr:
       defaults:
         debugLevel: DEBUG
-
-        image:
-          # segment counter
-          tag: ds7.1-gst1.24.12-local-20250625-220847
 
         camera:
           pipeline: "{{ template \"defaultPipeline\" . }}"
@@ -625,7 +621,6 @@ spec:
         - stream: line-crossing
         - stream: hands-up
         - stream: running
-        - stream: face-cover
         - stream: weapons
           weaponsDetection:
             scoreThreshold: 0.3

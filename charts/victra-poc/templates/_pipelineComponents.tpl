@@ -106,7 +106,15 @@ tee.
 {{- define "nvdsdewarperInference" }}
 {{- template "nvdsdewarperNvStreamMux" . }}
 {{- template "defaultNvInferServer" . }}
-{{- template "defaultNvDCFPerfTracker" . }}
+{{- template "defaultNvTracker" . }}
+{{- template "defaultNvStreamDemux" . }}
+{{- end }}
+
+
+{{- define "nvdsdewarperInferenceAccuracyTracker" }}
+{{- template "nvdsdewarperNvStreamMux" . }}
+{{- template "defaultNvInferServer" . }}
+{{- template "defaultNvDCFAccuracyTracker" . }}
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 

@@ -42,6 +42,15 @@
 {{- end }}
 
 
+{{- define "default360PipelineAccuracyTracker" }}
+{{- template "defaultRTSPSrc" . }}
+{{- template "nvdsdewarperInferenceAccuracyTracker" . }}
+{{- template "defaultMQTT" . }}
+{{- template "defaultMotionCells" . }}
+{{- template "defaultVideoRecorder" . }}
+{{- end }}
+
+
 {{- define "nvdsanalytics360Pipeline" }}
 {{- template "defaultRTSPSrc" . }}
 {{- template "nvdsdewarperInference" . }}
