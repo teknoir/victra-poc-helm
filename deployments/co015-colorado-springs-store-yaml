@@ -406,10 +406,14 @@ spec:
           alertHeatmapEnabled: true
 
         image:
-          tag: dev-89de145
+          tag: feature-dead-reconing-fix-cda0567
 
         labels:
           deviceID: "victra-poc-vm02-demo"
+
+        # Image cache
+        seaweedfs:
+          ttl: "10m"
 
         roiStreamConfig:
           enabled: true
