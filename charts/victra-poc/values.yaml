@@ -8,14 +8,14 @@ triton:
       image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-pose-estimation-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250612-062857
     - name: up-down-classifier
       image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250617-062359
-    - name: vggface-facerec
-      image: us-docker.pkg.dev/teknoir/gcr.io/vggface-facerec-triton:latest-initial-test-20250616-090311
 
 nvr:
   defaults:
     trackers:
       - name: nvidia-tracker
         image: us-docker.pkg.dev/teknoir/gcr.io/nvidia-tracker-deepstream:latest
+      - name: reid-swinb-1024-tracker
+        image: us-docker.pkg.dev/teknoir/gcr.io/reid-swinb-1024-tracker-deepstream:latest
 
     camera:
       pipelineRetryCount: 0
@@ -102,6 +102,12 @@ observatory-pipeline:
       interval: 500 # milliseconds
       window: 1 # seconds
       minDetectionsPerSecond: 1.8 # per second
+
+    lineCrossing:
+      intervalMs: 5000 # milliseconds
+      windowMs: 10000 # milliseconds >= dejitterBatchMs
+      dejitterBatchMs: 10000 # milliseconds
+      dejitterBatchCount: 3000
 
     clickhouse:
       detectionRetention: 1 # hours

@@ -23,6 +23,15 @@
 {{- end }}
 
 
+{{- define "defaultPipelineReIdSWINb1024Tracker" }}
+{{- template "defaultRTSPSrc" . }}
+{{- template "defaultInferenceReIdSWINb1024Tracker" . }}
+{{- template "defaultMQTT" . }}
+{{- template "defaultMotionCells" . }}
+{{- template "defaultVideoRecorder" . }}
+{{- end }}
+
+
 {{- define "nvdsanalyticsPipeline" }}
 {{- template "defaultRTSPSrc" . }}
 {{- template "defaultInference" . }}
@@ -45,6 +54,15 @@
 {{- define "default360PipelineAccuracyTracker" }}
 {{- template "defaultRTSPSrc" . }}
 {{- template "nvdsdewarperInferenceAccuracyTracker" . }}
+{{- template "defaultMQTT" . }}
+{{- template "defaultMotionCells" . }}
+{{- template "defaultVideoRecorder" . }}
+{{- end }}
+
+
+{{- define "default360PipelineReIdSWINb1024Tracker" }}
+{{- template "defaultRTSPSrc" . }}
+{{- template "nvdsdewarperInferenceReIdSWINb1024Tracker" . }}
 {{- template "defaultMQTT" . }}
 {{- template "defaultMotionCells" . }}
 {{- template "defaultVideoRecorder" . }}

@@ -54,8 +54,8 @@ src.
 {{- end }}
 
 
-{{- define "customStickyNvDeepSortTracker" }}
-    ! queue ! nvtracker tracker-width=960 tracker-height=544 input-tensor-meta=0 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/nvidia-tracker/config_tracker_custom_sticky_NvDeepSORT_b50.yml compute-hw=1 gpu-id=0
+{{- define "nvdcfNvReIdSWINb1024Tracker" }}
+    ! queue ! nvtracker tracker-width=128 tracker-height=256 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/reid-swinb-1024-tracker/config.yaml compute-hw=1 gpu-id=0
 {{- end }}
 
 
@@ -76,7 +76,6 @@ tee.
     ! queue ! nvinferserver name=nvis config-file-path=/models/rtdetr-wwfp/rtdetr-wwfp_config.pbtxt unique-id=2 interval=15
     ! queue ! nvinferserver config-file-path=/models/up-down-classifier/up_down_classifier_config.pbtxt unique-id=5
     ! queue ! nvinferserver config-file-path=/models/resnet50-pose-estimation/resnet50_pose_estimation_config.pbtxt unique-id=200
-    ! queue ! nvinferserver config-file-path=/models/vggface-facerec/vggface_facerec_config.pbtxt unique-id=300
 {{- end }}
 
 
@@ -93,6 +92,14 @@ tee.
 {{- template "defaultNvStreamMux" . }}
 {{- template "defaultNvInferServer" . }}
 {{- template "defaultNvDCFAccuracyTracker" . }}
+{{- template "defaultNvStreamDemux" . }}
+{{- end }}
+
+
+{{- define "defaultInferenceReIdSWINb1024Tracker" }}
+{{- template "defaultNvStreamMux" . }}
+{{- template "defaultNvInferServer" . }}
+{{- template "nvdcfNvReIdSWINb1024Tracker" . }}
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
@@ -118,6 +125,13 @@ tee.
 {{- template "defaultNvStreamDemux" . }}
 {{- end }}
 
+
+{{- define "nvdsdewarperInferenceReIdSWINb1024Tracker" }}
+{{- template "nvdsdewarperNvStreamMux" . }}
+{{- template "defaultNvInferServer" . }}
+{{- template "nvdcfNvReIdSWINb1024Tracker" . }}
+{{- template "defaultNvStreamDemux" . }}
+{{- end }}
 
 # NVDSANALYTICS
 {{- define "defaultNvDsAnalytics" }}

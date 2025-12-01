@@ -7,7 +7,7 @@ metadata:
 spec:
   repo: https://teknoir.github.io/victra-poc-helm
   chart: victra-poc
-  version: 0.1.2-beta.14
+  version: 0.1.2-beta.16
   targetNamespace: default
   valuesContent: |-
     nvr:
@@ -39,7 +39,7 @@ spec:
             motion:
               activeInterval: "0"
             uri: rtsp://admin:Redex1997!@192.168.51.117/stream1
-            pipeline: "{{ template \"defaultPipelineAccuracyTracker\" . }}"
+            #pipeline: "{{ template \"defaultPipelineReIdSWINb1024Tracker\" . }}"
             pipelineValues:
               videoRecorder:
                 segmentCount: 8640
@@ -53,7 +53,7 @@ spec:
             motion:
               activeInterval: "0"
             uri: rtsp://admin:Redex1997!@192.168.51.116/live.sdp
-            pipeline: "{{ template \"defaultPipelineAccuracyTracker\" . }}"
+            #pipeline: "{{ template \"defaultPipelineReIdSWINb1024Tracker\" . }}"
             pipelineValues:
               videoRecorder:
                 segmentCount: 8640
@@ -279,12 +279,18 @@ spec:
         debugLevel: DEBUG
 
         image:
-          tag: feature-dead-reconing-fix-cda0567
-          #tag: dev-6b3671d
+          #tag: dev-33e6cee
+          tag: feature-sort-cutouts-1e67a9a
 
         labels:
           deviceID: "victra-poc-03"
 
+        lineCrossing:
+          intervalMs: 5000 # milliseconds
+          windowMs: 10000 # milliseconds
+          dejitterBatchMs: 10000 # milliseconds
+          dejitterBatchCount: 3000
+          
         roiStreamConfig:
           enabled: true
           peripherals:
@@ -293,6 +299,9 @@ spec:
               config-height: 1080
               roi-config:
                 roi-loitering-Exclusion-Zone-0: "0;0;1920;0;1920;1080;0;1080"
+              lc-config:
+                lc-pos-Entry-0=1029;380;1029;580;893;580;1165;580
+                lc-pos-Exit-0=1029;780;1029;580;1165;580;893;580
 
             - name: nc0211-height-strip
               config-width: 1920
@@ -317,6 +326,8 @@ spec:
               lc-config:
                 lc-Entry-0: "997;448;998;648;900;649;1096;648"
                 lc-Exit-0: "999;848;998;648;1096;648;900;649"
+            #    lc-Entry-0: "1004;413;1007;613;910;615;1104;612"
+            #    lc-Exit-0: "1010;813;1007;613;1104;612;910;615"
 
             - name: nc0211-backroom-safe-door-90
               config-width: 1920
@@ -404,11 +415,11 @@ spec:
         - stream: hands-up
         - stream: running
         - stream: weapons
-          alerts:
-            weaponCutoutMinSize: 0
-          weaponsDetection:
-            scoreThreshold: 0.3
-            window: 1
+          #alerts:
+          #  weaponCutoutMinSize: 0
+          #weaponsDetection:
+          #  scoreThreshold: 0.3
+          #  window: 1
         - stream: safe-open
         - stream: backdoor-open
         - stream: facerec-cutout
