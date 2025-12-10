@@ -55,7 +55,7 @@ src.
 
 
 {{- define "nvdcfNvReIdSWINb1024Tracker" }}
-    ! queue ! nvtracker tracker-width=128 tracker-height=256 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/reid-swinb-1024-tracker/config.yaml compute-hw=1 gpu-id=0
+    ! queue ! nvtracker tracker-width=224 tracker-height=224 ll-lib-file=/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so ll-config-file=/trackers/reid-swinb-1024-tracker/config.yaml compute-hw=1 gpu-id=0
 {{- end }}
 
 

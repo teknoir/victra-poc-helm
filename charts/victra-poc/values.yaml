@@ -15,7 +15,7 @@ nvr:
       - name: nvidia-tracker
         image: us-docker.pkg.dev/teknoir/gcr.io/nvidia-tracker-deepstream:latest
       - name: reid-swinb-1024-tracker
-        image: us-docker.pkg.dev/teknoir/gcr.io/reid-swinb-1024-tracker-deepstream:latest
+        image: us-docker.pkg.dev/teknoir/gcr.io/reid-swinb-1024-tracker-deepstream:latest-retrained-20251209-132725
 
     camera:
       pipelineRetryCount: 0
