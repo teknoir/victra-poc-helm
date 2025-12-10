@@ -196,7 +196,7 @@ spec:
             motion:
               activeInterval: "0" # Has to be a string or it is interpreted as null
             uri: rtsp://admin:Redex1997!@192.168.51.112/stream1
-            pipeline: "{{ template \"nvdsdewarperInferenceReIdSWINb1024Tracker\" . }}"
+            pipeline: "{{ template \"default360PipelineReIdSWINb1024Tracker\" . }}"
             pipelineValues:
               videoRecorder:
                 segmentCount: 8640
@@ -320,12 +320,6 @@ spec:
         - stream: update-frame-rate-control
         - stream: record-detections
         - stream: update-movements
-        - stream: compreface
-          mqtt:
-            topicFaces: "toe/events/faces"
-          facerec:
-            compreFaceApiKey: "00000000-0000-0000-0000-000000000002"
-            faceRecThreshold: 0.992
         # ALERTS
         - stream: loitering
         - stream: person-down

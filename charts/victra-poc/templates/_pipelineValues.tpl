@@ -18,6 +18,12 @@ camera:
             height: 1080
             segmentSizeTime: 15
             segmentCount: 2880
+        motionCells:
+            width: 800
+            height: 600
+            threshold: 0.0001
+            gridX: 40
+            gridY: 30
 {{- end }}
 
 {{- define "cameraID" }}

@@ -402,12 +402,6 @@ spec:
         - stream: update-frame-rate-control
         - stream: record-detections
         - stream: update-movements
-        - stream: compreface
-          mqtt:
-            topicFaces: "toe/events/faces"
-          facerec:
-            compreFaceApiKey: "00000000-0000-0000-0000-000000000002"
-            faceRecThreshold: 0.992
         # ALERTS
         - stream: loitering
         - stream: person-down
