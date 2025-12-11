@@ -14,7 +14,7 @@ dependencies:
     version: 0.2.0
     repository: https://teknoir.github.io/triton-helm
   - name: observatory-pipeline
-    version: 0.2.0-beta.5
+    version: 0.2.0-beta.6
     repository: https://teknoir.github.io/observatory-pipeline-helm
   # Local dependency, dev only
   # - name: nvr
