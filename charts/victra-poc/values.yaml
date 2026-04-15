@@ -3,19 +3,19 @@ triton:
   modelRepositoryPath: /opt/teknoir/models
   models:
     - name: rtdetr-wwfp
-      image: us-docker.pkg.dev/teknoir/gcr.io/rtdetr-wwfp-triton:latest
+      image: ghcr.io/teknoir/rtdetr-wwfp-triton:latest
     - name: resnet50-pose-estimation
-      image:  us-docker.pkg.dev/teknoir/gcr.io/resnet50-pose-estimation-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250612-062857
+      image: ghcr.io/teknoir/resnet50-pose-estimation-triton:latest
     - name: up-down-classifier
-      image:  us-docker.pkg.dev/teknoir/gcr.io/up-down-classifier-triton:latest-amd64-trt10.8-cc8.9-wwfp-fc-20250617-062359
+      image: ghcr.io/teknoir/up-down-classifier-triton:latest
 
 nvr:
   defaults:
     trackers:
       - name: nvidia-tracker
-        image: us-docker.pkg.dev/teknoir/gcr.io/nvidia-tracker-deepstream:latest
+        image: ghcr.io/teknoir/nvidia-tracker-deepstream:latest
       - name: reid-swinb-1024-tracker
-        image: us-docker.pkg.dev/teknoir/gcr.io/reid-swinb-1024-tracker-deepstream:latest-retrained-20251209-132725
+        image: ghcr.io/teknoir/reid-swinb-1024-tracker-deepstream:latest
 
     camera:
       pipelineRetryCount: 0
